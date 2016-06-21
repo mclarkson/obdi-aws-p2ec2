@@ -12,7 +12,7 @@ Creates AWS EC2 Instances from Full System Backups.
 # What is it?
 
 No entry is made in the sidebar for this plugin since this plugin is accessed
-from other compatible plugins. For example, when this plugin is installed the
+from other compatible plugins. For example, when this plugin is installed, the
 obdi-rsyncbackup plugin will show a 'Create Amazon EC2 Instance' button in the
 file viewer when it thinks it has found a root filesystem. Pressing the button
 will take the user to this plugin.

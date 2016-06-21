@@ -110,6 +110,17 @@ mgrApp.controller("helloWorldRunscript", function ($scope,$http,$uibModal,$log,
   }
 
   // ----------------------------------------------------------------------
+  $scope.goBack = function( id ) {
+  // ----------------------------------------------------------------------
+
+    if( typeof $rootScope.outputlines_plugin.back === "undefined" ) {
+      $scope.setView( "plugins/systemjobs/html/view.html" );
+    } else {
+      $scope.setView( $rootScope.outputlines_plugin.back )
+    }
+  }
+
+  // ----------------------------------------------------------------------
   $scope.FillEnvironmentsTable = function() {
   // ----------------------------------------------------------------------
 
