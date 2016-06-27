@@ -51,6 +51,22 @@ curl -k -d '{
 }' $proto://$ipport/api/admin/$guid/envcaps
 
 #
+# Create environment capabilities for AWS credentials
+#
+
+curl -k -d '{
+    "Code":"AWS_ACCESS_KEY_ID_1",
+    "Desc":"AWS credential. For example: ALIBJX4KM6OPZEEW6B2Q",
+    "IsWorkerDef":true
+}' $proto://$ipport/api/admin/$guid/envcaps
+
+curl -k -d '{
+    "Code":"AWS_SECRET_ACCESS_KEY_1",
+    "Desc":"AWS credential. For example: MY-SECRET-KEY.",
+    "IsWorkerDef":true
+}' $proto://$ipport/api/admin/$guid/envcaps
+
+#
 # Create the plugin entry in obdi, but it's not shown in the sidebar.
 #
 
