@@ -22,7 +22,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       $timeout,baseUrl,$rootScope) {
 
   // Data
-  $scope.environments = [];
+  $scope.regions = [];
   $scope.env = {};
   $scope.scriptlines = "";
 
@@ -37,7 +37,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
   // Hiding/Showing
   $scope.showkeybtnblockhidden = false;
-  $scope.btnsayhellodisabled = true;
+  $scope.btnchooseAWSregion = true;
+  $scope.btncreateInstance = true;
   $scope.btnsayhellopressed = false;
   $scope.btnenvlistdisabled = false;
   $scope.page_result = false;
@@ -78,7 +79,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.Restart = function() {
   // ----------------------------------------------------------------------
     clearMessages();
-    $scope.btnsayhellodisabled = true;
+    $scope.btnchooseAWSregion = true;
+    $scope.btncreateInstance = true;
     $scope.btnenvlistdisabled = false;
     $scope.page_result = false;
     $scope.envchosen = false;
@@ -93,7 +95,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.envchosen = true;
     $scope.btnenvlistdisabled = true;
     $scope.env = envobj;
-    $scope.btnsayhellodisabled = false;
+    $scope.btnchooseAWSregion = false;
+    $scope.btncreateInstance = true;
     $scope.status.isopen = !$scope.status.isopen; //close the dropdown
   };
 
@@ -103,7 +106,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     clearMessages();
     $scope.mainview = true;
     $scope.btnenvlistdisabled = true;
-    $scope.btnsayhellodisabled = false;
+    $scope.btnchooseAWSregion = false;
+    $scope.btncreateInstance = false;
 
     // Reset the search text (not used since search is disabled)
     //$rootScope.$broadcast( "setsearchtext", $scope.previousfilter );
@@ -121,20 +125,21 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   }
 
   // ----------------------------------------------------------------------
-  $scope.FillEnvironmentsTable = function() {
+  $scope.FillRegionsTable = function() {
   // ----------------------------------------------------------------------
 
     $http({
       method: 'GET',
       url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
-           + "/envs?writeable=1"
-           + '&time='+new Date().getTime().toString()
+           + "/aws-ec2lib/describe-regions"
+           + '?time='+new Date().getTime().toString()
     }).success( function(data, status, headers, config) {
 
-      $scope.environments = data;
-      if( data.length == 0 ) {
-        $scope.serverlist_empty = true;
-        $scope.btnenvlistdisabled = true;
+      try {
+        $scope.regions = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
       }
 
     }).error( function(data,status) {
@@ -162,18 +167,15 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     });
   };
 
-  // Get the list of environments straight away
-  $scope.FillEnvironmentsTable();
-
   // Polling functions
 
   // ----------------------------------------------------------------------
-  $scope.RunHelloScript = function( ) {
+  $scope.ListInstances = function( ) {
   // ----------------------------------------------------------------------
   // Runs the helloworld-runscript.sh script on the worker.
 
-    $scope.page_result = false;
-    $scope.scriptlines = "";
+    $scope.envchosen = false;
+    $scope.list_instances = true;
 
     $http({
       method: 'GET',
@@ -352,5 +354,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       $uibModalInstance.dismiss('cancel');
     };
   };
+
+  // Get the list of regions straight away
+  $scope.FillRegionsTable();
+
 
 });
