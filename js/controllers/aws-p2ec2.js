@@ -180,12 +180,20 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $http({
       method: 'GET',
       url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
-           + "/helloworld-runscript/helloworld-runscript?env_id="
-           + $scope.env.Id
-           + "&var_a=ScriptArgument"
+           + "/aws-ec2lib/describe-instances?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
            + '&time='+new Date().getTime().toString()
     }).success( function(data, status, headers, config) {
-      $scope.PollForJobFinish(data.JobId,50,0,$scope.GetHelloOutputLine);
+
+      try {
+        $scope.instances = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      $scope.page_result = true;
+
     }).error( function(data,status) {
       if (status>=500) {
         $scope.login.errtext = "Server error.";
@@ -213,7 +221,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   };
 
   // ----------------------------------------------------------------------
-  $scope.GetHelloOutputLine = function( id ) {
+  $scope.GetInstancesOutputLine = function( id ) {
   // ----------------------------------------------------------------------
 
     $http({
@@ -223,8 +231,11 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
            + '&time='+new Date().getTime().toString()
     }).success( function(data, status, headers, config) {
 
-      for( i=0; i < data.length; ++i ) {
-          $scope.scriptlines += data[i].Text;
+      try {
+        $scope.instances = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
       }
 
       $scope.page_result = true;
