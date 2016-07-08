@@ -23,8 +23,10 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
   // Data
   $scope.regions = [];
-  $scope.env = {};
+  $scope.region = {};
   $scope.scriptlines = "";
+  $scope.reservations = [];
+  $scope.instances = [];
 
   // Pages
   $scope.mainview = true;
@@ -80,21 +82,23 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   // ----------------------------------------------------------------------
     clearMessages();
     $scope.btnchooseAWSregion = true;
-    $scope.btncreateInstance = true;
+    $scope.btncreateInstance = false;
     $scope.btnenvlistdisabled = false;
     $scope.page_result = false;
     $scope.envchosen = false;
+    $scope.list_instances = false;
+    $scope.btncreateInstance = true;
   };
 
   // ----------------------------------------------------------------------
-  $scope.envChoice = function( envobj, $event ) {
+  $scope.envChoice = function( obj, $event ) {
   // ----------------------------------------------------------------------
     clearMessages();
     $event.preventDefault();
     $event.stopPropagation();
     $scope.envchosen = true;
     $scope.btnenvlistdisabled = true;
-    $scope.env = envobj;
+    $scope.region = obj;
     $scope.btnchooseAWSregion = false;
     $scope.btncreateInstance = true;
     $scope.status.isopen = !$scope.status.isopen; //close the dropdown
@@ -107,7 +111,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.mainview = true;
     $scope.btnenvlistdisabled = true;
     $scope.btnchooseAWSregion = false;
-    $scope.btncreateInstance = false;
+    $scope.btncreateInstance = true;
 
     // Reset the search text (not used since search is disabled)
     //$rootScope.$broadcast( "setsearchtext", $scope.previousfilter );
@@ -176,23 +180,38 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
     $scope.envchosen = false;
     $scope.list_instances = true;
+    $scope.list_instances_inprogress = true;
+    $scope.list_instances_results = false;
+    $scope.list_instances_empty = false;
 
     $http({
       method: 'GET',
       url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
            + "/aws-ec2lib/describe-instances?env_id="
            + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.region.Name
            + '&time='+new Date().getTime().toString()
     }).success( function(data, status, headers, config) {
 
       try {
-        $scope.instances = $.parseJSON(data.Text);
+        $scope.reservations = $.parseJSON(data.Text);
       } catch (e) {
         clearMessages();
         $scope.message = "Error: " + e;
       }
 
-      $scope.page_result = true;
+      $scope.list_instances_inprogress = false;
+      $scope.list_instances_empty = true;
+
+      // Pull out all the instances
+      $scope.instances = [];
+      for( var i=0; i<$scope.reservations.length; ++i) {
+        for( var j=0; j<$scope.reservations[i].Instances.length; ++j) {
+          $scope.instances.push($scope.reservations[i].Instances[j]);
+          $scope.list_instances_empty = false;
+          $scope.list_instances_results = true;
+        }
+      }
 
     }).error( function(data,status) {
       if (status>=500) {
