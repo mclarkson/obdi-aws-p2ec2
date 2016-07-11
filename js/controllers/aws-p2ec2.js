@@ -27,6 +27,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.scriptlines = "";
   $scope.reservations = [];
   $scope.instances = [];
+  $scope.notifyme = [];
+  $scope.datacopy = {};
 
   // Pages
   $scope.mainview = true;
@@ -38,13 +40,18 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.login.error = false;
 
   // Hiding/Showing
+  $scope.showmainbtnblock = true;
   $scope.showkeybtnblockhidden = false;
   $scope.btnchooseAWSregion = true;
-  $scope.btncreateInstance = true;
+  $scope.btnlistInstancesDisabled = true;
+  $scope.btncreateInstanceDisabled = true;
+  $scope.btncreateVolumeDisabled = true;
   $scope.btnsayhellopressed = false;
-  $scope.btnenvlistdisabled = false;
+  $scope.btnregionListDisabled = false;
   $scope.page_result = false;
   $scope.envchosen = false;
+  $scope.list_instances = false;
+  $scope.create_volume = false;
   $scope.status = {};
 
   // Disable the search box
@@ -81,13 +88,20 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.Restart = function() {
   // ----------------------------------------------------------------------
     clearMessages();
-    $scope.btnchooseAWSregion = true;
-    $scope.btncreateInstance = false;
-    $scope.btnenvlistdisabled = false;
     $scope.page_result = false;
     $scope.envchosen = false;
     $scope.list_instances = false;
-    $scope.btncreateInstance = true;
+    $scope.create_volume = false;
+    $scope.btnregionListDisabled = false;
+    $scope.btncreateInstanceDisabled = true;
+    $scope.btncreateVolumeDisabled = true;
+    $scope.btnlistInstancesDisabled = true;
+    $scope.showmainbtnblock = true;
+
+    var box = $('#mainbtnblock');
+    box.removeClass('visuallyhidden');
+    box.removeClass('hidden');
+    box.removeClass('overflowhidden');
   };
 
   // ----------------------------------------------------------------------
@@ -97,10 +111,12 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $event.preventDefault();
     $event.stopPropagation();
     $scope.envchosen = true;
-    $scope.btnenvlistdisabled = true;
+    $scope.btnregionListDisabled = true;
     $scope.region = obj;
-    $scope.btnchooseAWSregion = false;
-    $scope.btncreateInstance = true;
+    $scope.btnlistInstancesDisabled = false;
+    $scope.btncreateVolumeDisabled = false;
+    $scope.btncreateInstanceDisabled = true;
+    $scope.showmainbtnblock = true;
     $scope.status.isopen = !$scope.status.isopen; //close the dropdown
   };
 
@@ -109,9 +125,11 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   // ----------------------------------------------------------------------
     clearMessages();
     $scope.mainview = true;
-    $scope.btnenvlistdisabled = true;
-    $scope.btnchooseAWSregion = false;
-    $scope.btncreateInstance = true;
+    $scope.btnregionListDisabled = false;
+    $scope.btnlistInstancesDisabled = true;
+    $scope.btncreateInstanceDisabled = true;
+    $scope.btncreateVolumeDisabled = true;
+    $scope.showmainbtnblock = true;
 
     // Reset the search text (not used since search is disabled)
     //$rootScope.$broadcast( "setsearchtext", $scope.previousfilter );
@@ -175,6 +193,109 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
   // ----------------------------------------------------------------------
   $scope.ListInstances = function( ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    $scope.envchosen = false;
+    $scope.list_instances = true;
+    $scope.list_instances_inprogress = true;
+    $scope.list_instances_results = false;
+    $scope.list_instances_empty = false;
+
+    $http({
+      method: 'GET',
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/describe-instances?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.region.Name
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.reservations = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      $scope.list_instances_inprogress = false;
+      $scope.list_instances_empty = true;
+
+      // Pull out all the instances
+      $scope.instances = [];
+
+      if( !$scope.reservations ) return;
+
+      for( var i=0; i<$scope.reservations.length; ++i) {
+        for( var j=0; j<$scope.reservations[i].Instances.length; ++j) {
+          $scope.instances.push($scope.reservations[i].Instances[j]);
+          $scope.list_instances_empty = false;
+          $scope.list_instances_results = true;
+        }
+      }
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.CreateWhat = function( ) {
+  // ----------------------------------------------------------------------
+
+    if( $scope.datacopy.wants_instance ) return "Instance";
+    if( $scope.datacopy.wants_ami ) return "AMI";
+    if( $scope.datacopy.wants_snapshot ) return "Snapshot";
+    return "Filesystem";
+  }
+
+  // ----------------------------------------------------------------------
+  $scope.CreateVolume = function( ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+  
+    $timeout( function() {
+      var box = $('#mainbtnblock');
+      box.addClass('visuallyhidden');
+      box.addClass('overflowhidden');
+      box.one('transitionend', function(e) { box.addClass('hidden'); });
+    }, 750);
+
+    $scope.list_instances = false;
+    $scope.btnlistInstancesDisabled = true;
+    $scope.btncreateInstanceDisabled = true;
+    $scope.btncreateVolumeDisabled = false;
+    $scope.showmainbtnblock = false;
+    $scope.envchosen = false;
+    $scope.create_volume = true;
+
+    $scope.datacopy = {};
+    $scope.datacopy.instance_type = "t1.micro";
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.CreateVolumeREST = function( ) {
   // ----------------------------------------------------------------------
   // Runs the helloworld-runscript.sh script on the worker.
 

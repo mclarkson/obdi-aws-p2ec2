@@ -1,6 +1,9 @@
 # obdi-aws-p2ec2
 Creates AWS EC2 Instances from Full System Backups.
 
+Dependencies: [obdi-aws-ec2lib](https://github.com/mclarkson/obdi-aws-ec2lib)
+Known Users: [obdi-rsyncbackup](https://github.com/mclarkson/obdi-rsyncbackup)
+
 # Todo
 
 * Delete snapshots
