@@ -27,8 +27,10 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.scriptlines = "";
   $scope.reservations = [];
   $scope.instances = [];
-  $scope.notifyme = [];
+  $scope.notifyme = {};
+  $scope.notifyme.now = false;
   $scope.datacopy = {};
+  $scope.dirsize = {};
 
   // Pages
   $scope.mainview = true;
@@ -53,6 +55,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.list_instances = false;
   $scope.create_volume = false;
   $scope.status = {};
+  $scope.dirsize_not_started = true;
+  $scope.dirsize_in_progress = false;
+  $scope.dirsize_complete = false;
 
   // Disable the search box
   $rootScope.$broadcast( "searchdisabled", true );
@@ -97,6 +102,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.btncreateVolumeDisabled = true;
     $scope.btnlistInstancesDisabled = true;
     $scope.showmainbtnblock = true;
+    $scope.dirsize_not_started = true;
+    $scope.dirsize_in_progress = false;
+    $scope.dirsize_complete = false;
 
     var box = $('#mainbtnblock');
     box.removeClass('visuallyhidden');
@@ -130,6 +138,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.btncreateInstanceDisabled = true;
     $scope.btncreateVolumeDisabled = true;
     $scope.showmainbtnblock = true;
+    $scope.dirsize_not_started = true;
+    $scope.dirsize_in_progress = false;
+    $scope.dirsize_complete = false;
 
     // Reset the search text (not used since search is disabled)
     //$rootScope.$broadcast( "setsearchtext", $scope.previousfilter );
@@ -261,6 +272,156 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   };
 
   // ----------------------------------------------------------------------
+  $scope.CalcDirSize = function( ) {
+  // ----------------------------------------------------------------------
+
+    $scope.dirsize_not_started = false;
+    $scope.dirsize_in_progress = true;
+    $scope.dirsize_complete = false;
+
+    $http({
+      method: 'GET',
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/rsyncbackup/dirsize?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&task_id="
+           + $scope.awsp2ec2_plugin.taskId
+           + "&path="
+           + $scope.awsp2ec2_plugin.path
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      $scope.PollForJobFinish(data.JobId,10,0,$scope.GetDirSizeOutputLine);
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  }
+
+  // ----------------------------------------------------------------------
+  $scope.GetDirSizeOutputLine = function( id ) {
+  // ----------------------------------------------------------------------
+
+    $http({
+      method: 'GET',
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/outputlines?job_id=" + id
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      $scope.dirsize = {};
+
+      // Extract data into array
+      //
+      try {
+        $scope.dirsize = $.parseJSON(data[0].Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+        $scope.message_jobid = id;
+      }
+
+      $scope.dirsize_not_started = false;
+      $scope.dirsize_in_progress = false;
+      $scope.dirsize_complete = true;
+
+      if( $scope.notifyme.now == true )
+        $scope.notifyMe("Obdi job has finished.");
+
+      $scope.datacopy.size_gb = Math.round(($scope.dirsize[0].sizeb)/1000/1000/1000) + 20;
+      
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.notifySetup = function( ) {
+  // ----------------------------------------------------------------------
+
+    // Let's check if the browser supports notifications
+    if (!("Notification" in window)) {
+      alert("This browser does not support desktop notification");
+    }
+
+    // Let's check whether notification permissions have already been granted
+    else if (Notification.permission !== "granted") {
+      Notification.requestPermission(function (permission) {
+        if (permission !== "granted") {
+          ; // set a variable
+        }
+      });
+    }
+  }
+
+  // ----------------------------------------------------------------------
+  $scope.notifyMe = function( text ) {
+  // ----------------------------------------------------------------------
+
+    // Let's check if the browser supports notifications
+    if (!("Notification" in window)) {
+      alert("This browser does not support desktop notification");
+    }
+
+    // Let's check whether notification permissions have already been granted
+    else if (Notification.permission === "granted") {
+      // If it's okay let's create a notification
+      var notification = new Notification(text);
+    }
+
+    // Otherwise, we need to ask the user for permission
+    else if (Notification.permission !== 'denied') {
+      Notification.requestPermission(function (permission) {
+        // If the user accepts, let's create a notification
+        if (permission === "granted") {
+          var notification = new Notification(text);
+        }
+      });
+    }
+
+    // At last, if the user has denied notifications, and you 
+    // want to be respectful there is no need to bother them any more.
+  }
+
+  // ----------------------------------------------------------------------
   $scope.CreateWhat = function( ) {
   // ----------------------------------------------------------------------
 
@@ -273,14 +434,13 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   // ----------------------------------------------------------------------
   $scope.CreateVolume = function( ) {
   // ----------------------------------------------------------------------
-  // Runs the helloworld-runscript.sh script on the worker.
   
     $timeout( function() {
       var box = $('#mainbtnblock');
       box.addClass('visuallyhidden');
       box.addClass('overflowhidden');
       box.one('transitionend', function(e) { box.addClass('hidden'); });
-    }, 750);
+    }, 300);
 
     $scope.list_instances = false;
     $scope.btnlistInstancesDisabled = true;
@@ -459,7 +619,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       }, delay );
   };
 
-
   // Modal dialog
 
   // --------------------------------------------------------------------
@@ -507,7 +666,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   };
 
   // Get the list of regions straight away
+  $scope.notifySetup();
   $scope.FillRegionsTable();
-
-
 });
