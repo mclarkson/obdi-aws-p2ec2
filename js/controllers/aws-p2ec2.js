@@ -428,7 +428,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     if( $scope.datacopy.wants_instance ) return "Instance";
     if( $scope.datacopy.wants_ami ) return "AMI";
     if( $scope.datacopy.wants_snapshot ) return "Snapshot";
-    return "Filesystem";
+    return "Volume";
   }
 
   // ----------------------------------------------------------------------
@@ -574,7 +574,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         }).success( function(data, status, headers, config) {
           job = data[0];
           if(job.Status == 0 || job.Status == 1 || job.Status == 4) {
-            if( count > 120 ) {
+            if( count > 1000 ) { // 1000 - usually 120, this could take long
               clearMessages();
               $scope.message = "Job took too long. check job ID " +
                                + id + ", then try again.";

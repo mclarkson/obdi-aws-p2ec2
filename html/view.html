@@ -39,7 +39,7 @@
   <div class="row">
     <div class="col-lg-12">
       <h3 class="page-header" style="margin-bottom: -20px">
-        Create EC2 Instance from Files
+        Amazon EC2 
       <button class="btn btn-sm btn-success pull-right" type="button"
         ng-if="create_volume"
         ng-click="goBack()" style="margin-top: -5px; margin-right: 8px;">
@@ -92,7 +92,7 @@
 
   <div id="mainbtnblock" class="box" style="margin-top: 20px">
 
-    Amazon AWS EC2 instances or machine images (AMIs) can be created using this page.
+    Amazon AWS EC2 instances or Amazon Machine Images (AMIs) can be created using this page.
 
     <div ng-if="mainview">
 
@@ -218,8 +218,22 @@
       -->
 
 	<div class="form-group" style="margin-top:24px;margin-bottom:12px;">
-	  <label for="rsync_opts" class="col-sm-3 control-label">Size Query</label>
-	  <div class="col-sm-7">
+	  <label for="rsync_opts" class="col-sm-3 control-label">
+            <span class="mypopover"
+              popover-trigger="mouseenter mouseleave"
+              popover-title="Size Query"
+              popover-placement="right"
+              popover-append-to-body="true"
+              uib-popover="Press the Calculate Directory Size button to calculate
+                           the size of the directory that will be written to
+                           Amazon EC2. Select 'Notify me when done' to get a
+                           system notification when the calculation is complete.
+                           The Root Disk Size field, below, will be updated
+                           with the calculated size plus 20 GB.">
+              Size Query
+            </span>
+          </label>
+	  <div class="col-sm-9">
 	    <div class="btn-group">  
 	      <button class="btn btn-primary" ng-click="CalcDirSize()">
 		Calculate Directory Size&nbsp;
@@ -251,30 +265,67 @@
 	</div>
 
 	<div class="form-group">
-	  <label for="size_gb" class="col-sm-3 control-label">Root disk size</label>
-          <div class="col-xs-3">
-	    <input class="form-control col-xs-3" id="size_gb"
-	      ng-model="datacopy.size_gb" placeholder="Size in Gigabytes"
-              type="text" ng-trim='false' required>
-          </div>
-	</div>
-	<div class="col-sm-offset-3">
-	  <button type="button" class="btn btn-default"
-            style="margin-left:8px; margin-bottom:16px">
-	    <i class="fa fa-cog"></i> Customise Root Disk</button>
-	  <button type="button" class="btn btn-default"
-	    style="margin-left:8px; margin-bottom:16px">
-	    <i class="fa fa-cog"></i> Customise Instance</button>
-	</div>
-
-	<div class="form-group">
-	  <label for="size_gb" class="col-sm-3 control-label">Instance Type</label>
-          <div class="col-xs-5">
+	  <label for="size_gb" class="col-sm-3 control-label">
+            <span class="mypopover"
+              popover-trigger="mouseenter mouseleave"
+              popover-title="Instance Type"
+              popover-placement="right"
+              popover-append-to-body="true"
+              uib-popover="The instance type will be used if the Create Instance
+                           option is selected. This can be changed by clicking
+                           the Customise Instance button below.">
+              Instance Type
+            </span>
+          </label>
+          <div class="col-sm-5">
 	    <input class="form-control col-xs-5" id="size_gb"
 	      ng-model="datacopy.instance_type" placeholder="" type="text"
 	      ng-trim='false' ng-disabled="true" required>
           </div>
 	</div>
+
+	<div class="form-group">
+	  <label for="size_gb" class="col-sm-3 control-label">
+            <span class="mypopover"
+              popover-trigger="mouseenter mouseleave"
+              popover-title="Root Disk Size"
+              popover-placement="right"
+              popover-append-to-body="true"
+              uib-popover="The size of the Root Disk, /dev/sda or /dev/xvda, is
+                           specified here. Enter an integer. Click the Customise
+                           Root Disk button to set other EBS volume options for
+                           this disk.">
+                Root Disk Size
+            </span>
+          </label>
+            
+          <div class="col-sm-3">
+	    <input class="form-control col-xs-3" id="size_gb"
+	      ng-model="datacopy.size_gb" placeholder="E.g. 10"
+              type="text" ng-trim='false' required>
+          </div>
+          <!--
+          <div class="col-sm-3" style="padding-left:0;">
+            <p style="padding-top: 7px;">GB</p>
+          </div>
+          -->
+	</div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-3 col-sm-3">
+            <button style="" class="btn btn-default" type="button">
+              <i class="fa fa-cog"></i> Customise Root Disk
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-3 col-sm-3">
+            <button style="" class="btn btn-default" type="button">
+              <i class="fa fa-cog"></i> Customise Instance
+            </button>
+          </div>
+        </div>
 
 	<div class="col-sm-offset-3 col-sm-7">
 	  <div class="checkbox" style="padding-top: 0px;">
