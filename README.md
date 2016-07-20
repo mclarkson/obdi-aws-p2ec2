@@ -64,7 +64,8 @@ Set the AWS_ACCESS_KEY_ID_1 json object in the environment, using the Admin inte
 > The password for the Obdi worker.
 
 *aws_filter*
-> The global filter to apply, if any.
+> The global filter to apply, if any. For example, you might want to filter all
+> results by 'key-name=ourkeyname' or 'owner-id=25513944296'.
 
 # Dev
 
