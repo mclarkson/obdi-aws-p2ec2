@@ -188,7 +188,8 @@
 	    </tr>
 	    </thead>
 	    <tbody>
-	      <tr ng-repeat="item in instances | filter:instancesfilter">
+	      <tr ng-repeat="item in instances | filter:instancesfilter"
+               class="{{style(item.State.Code)}}">
 		<td>{{$index+1}}</td>
 		<td>{{item.InstanceId}}</td>
 		<td>{{item.Tags[0].Value}}</td>

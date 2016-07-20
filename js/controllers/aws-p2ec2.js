@@ -432,6 +432,27 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   }
 
   // ----------------------------------------------------------------------
+  $scope.style = function( n ) {
+  // ----------------------------------------------------------------------
+    ret = "";
+
+    switch( n ) {
+      // case 0:  // pending
+      // case 16: // running
+      case 48: // terminated
+        ret = "danger";
+        break;
+      case 32: // shutting down
+      case 64: // stopping
+      case 80: // stopped
+        ret = "warning";
+        break;
+    }
+
+    return ret;
+  }
+
+  // ----------------------------------------------------------------------
   $scope.CreateVolume = function( ) {
   // ----------------------------------------------------------------------
   
