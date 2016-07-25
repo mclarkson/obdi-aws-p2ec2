@@ -70,3 +70,22 @@ Set the AWS_ACCESS_KEY_ID_1 json object in the environment, using the Admin inte
 # Dev
 
 ![](images/instance-creation.png?raw=true)
+
+### Migrate
+
+```
+# Log in
+
+$ ipport="127.0.0.1:443"
+
+$ guid=`curl -ks -d '{"Login":"nomen.nescio","Password":"password"}' \
+  https://$ipport/api/login | grep -o "[a-z0-9][^\"]*"`
+
+# Migrate files to AWS instance
+
+$ curl -k -d '{
+    "":""
+}' "https://$ipport/api/nomen.nescio/$guid/aws-p2ec2/migrate?env_id=1"
+
+```
+

@@ -42,7 +42,7 @@
         Amazon EC2 
       <button class="btn btn-sm btn-success pull-right" type="button"
         ng-if="create_volume"
-        ng-click="goBack()" style="margin-top: -5px; margin-right: 8px;">
+        ng-click="Migrate()" style="margin-top: -5px; margin-right: 8px;">
         <i class="fa fa-check"> </i> Create {{CreateWhat()}}</button>
       <button class="btn btn-sm btn-success pull-right" type="button"
         ng-click="Restart()" ng-if="!create_volume"
@@ -53,6 +53,13 @@
         <i class="fa fa-arrow-left"> </i> Go Back</button></h3>
     </div>
   </div>
+
+  <style>
+    .alert {
+      margin-top: 20px;
+      margin-bottom: 0;
+    }
+  </style>
 
   <div class="row">
     <div class="col-sm-12">
@@ -355,6 +362,58 @@
 
         </div>
       </div>
+    </div>
+  </div>
+
+  <style>
+    @media(min-width:768px) {
+      .right {
+          text-align: right;
+      }
+    }
+  </style>
+
+  <div class="row" ng-if="migrate.page" style="margin-top: 0">
+    <div class="col-sm-12">
+      <h4 class="page-header">
+        AWS Region: {{region.Name}} - Creating {{CreateWhat()}}</h4>
+
+      <!-- Availability Zone -->
+
+      <div ng-if="migrate.obdi_worker_availzone.status == 'started'">
+        <p class="col-sm-4 right"><b>Availability Zone:</b>
+        <p class="col-sm-8">Getting the obdi worker instance name
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i></p>
+      </div>
+      <div ng-if="migrate.obdi_worker_availzone.status == 'gotinstanceid'">
+        <p class="col-sm-4 right"><b>Availability Zone:</b>
+        <p class="col-sm-8">Getting availability zone for
+          {{awsdata.Aws_obdi_worker_instance_id}}
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i></p>
+      </div>
+      <div ng-if="migrate.obdi_worker_availzone.status == 'finished'">
+        <p class="col-sm-4 right"><b>Availability Zone:</b>
+        <p class="col-sm-8">Obdi worker {{awsdata.Aws_obdi_worker_instance_id}}
+          is in zone <b>{{awsworker[0].Instances[0].AvailabilityZone}}</b>
+        </p>
+      </div>
+
+      <!-- Check Availability Zone -->
+
+      <div ng-if="migrate.obdi_worker_check_availzone.status == 'started'">
+        <p class="col-sm-4 right">
+        <p class="col-sm-8">Checking status
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.obdi_worker_check_availzone.status == 'finished'">
+        <p class="col-sm-4 right">
+        <p class="col-sm-8">Zone Status
+          {{migrate.obdi_worker_check_availzone.state}}<br>
+          {{migrate.obdi_worker_check_availzone.message}}
+        </p>
+      </div>
+
     </div>
   </div>
 
