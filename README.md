@@ -71,7 +71,11 @@ Set the AWS_ACCESS_KEY_ID_1 json object in the environment, using the Admin inte
 
 ![](images/instance-creation.png?raw=true)
 
-### Migrate
+### get-not-so-secret-data
+
+Gets Json Object Capability data for AWS_ACCESS_KEY_ID_1 for an environment.
+This data will be stored in the Browser's DOM so Aws_secret_access_key and
+Aws_obdi_worker_key have obfuscated values.
 
 ```
 # Log in
@@ -81,11 +85,9 @@ $ ipport="127.0.0.1:443"
 $ guid=`curl -ks -d '{"Login":"nomen.nescio","Password":"password"}' \
   https://$ipport/api/login | grep -o "[a-z0-9][^\"]*"`
 
-# Migrate files to AWS instance
+# Get [not-so-] secret AWS data from the Capability AWS_ACCESS_KEY_ID_1
 
-$ curl -k -d '{
-    "":""
-}' "https://$ipport/api/nomen.nescio/$guid/aws-p2ec2/migrate?env_id=1"
+$ curl -k "https://$ipport/api/nomen.nescio/$guid/aws-p2ec2/get-not-so-secret-data?env_id=1"
 
 ```
 

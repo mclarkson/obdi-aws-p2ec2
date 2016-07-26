@@ -394,23 +394,59 @@
       <div ng-if="migrate.obdi_worker_availzone.status == 'finished'">
         <p class="col-sm-4 right"><b>Availability Zone:</b>
         <p class="col-sm-8">Obdi worker {{awsdata.Aws_obdi_worker_instance_id}}
-          is in zone <b>{{awsworker[0].Instances[0].AvailabilityZone}}</b>
+          is in zone {{awsworker[0].Instances[0].AvailabilityZone}}
         </p>
       </div>
 
       <!-- Check Availability Zone -->
 
       <div ng-if="migrate.obdi_worker_check_availzone.status == 'started'">
-        <p class="col-sm-4 right">
-        <p class="col-sm-8">Checking status
+        <p class="col-sm-offset-4 col-sm-8">Checking status
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
       <div ng-if="migrate.obdi_worker_check_availzone.status == 'finished'">
-        <p class="col-sm-4 right">
-        <p class="col-sm-8">Zone Status
+        <p class="col-sm-offset-4 col-sm-8">Zone Status
           {{migrate.obdi_worker_check_availzone.state}}<br>
           {{migrate.obdi_worker_check_availzone.message}}
+        </p>
+      </div>
+
+      <!-- Create Volume -->
+
+      <div ng-if="migrate.create_volume.status == 'started'">
+        <p class="col-sm-4 right"><b>EBS Volume:</b>
+        <p class="col-sm-8">Creating volume
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.create_volume.status == 'finished'">
+        <p class="col-sm-4 right"><b>EBS Volume:</b>
+        <p class="col-sm-8">Volume created as 
+          {{migrate.create_volume.volumeid}}<br>
+        </p>
+      </div>
+      <div ng-if="migrate.attach_volume.status == 'waiting'">
+        <p class="col-sm-offset-4 col-sm-8">Waiting for
+          volume to become ready
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.attach_volume.status == 'started'">
+        <p class="col-sm-offset-4 col-sm-8">Attaching volume
+          failed. Trying another mount point
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.attach_volume.status == 'retrying'">
+        <p class="col-sm-offset-4 col-sm-8">Attaching volume to
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.attach_volume.status == 'finished'">
+        <p class="col-sm-offset-4 col-sm-8">Volume attached to
+          {{awsdata.Aws_obdi_worker_instance_id}} at 
+          {{migrate.attach_volume.mountpoint}}
         </p>
       </div>
 

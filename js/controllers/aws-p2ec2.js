@@ -263,77 +263,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   };
 
   // ----------------------------------------------------------------------
-  $scope.Migrate_CheckAvailZone = function( ) {
-  // ----------------------------------------------------------------------
-  // Runs the helloworld-runscript.sh script on the worker.
-
-    $http({
-      method: 'GET',
-      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
-           + "/aws-ec2lib/describe-availability-zone?env_id="
-           + $rootScope.awsp2ec2_plugin.envId
-           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
-           + "&availability_zone="
-           + $scope.awsworker[0].Instances[0].AvailabilityZone
-           + '&time='+new Date().getTime().toString()
-    }).success( function(data, status, headers, config) {
-
-      try {
-        var azstatus = $.parseJSON(data.Text);
-      } catch (e) {
-        clearMessages();
-        $scope.message = "Error: " + e;
-      }
-
-      if( azstatus == null ) {
-        $scope.message = "Error: Could not get the status of the availability " +
-                         "zone the Obdi worker is in."
-      }
-
-      $scope.migrate.obdi_worker_check_availzone = {};
-      $scope.migrate.obdi_worker_check_availzone.status = "finished";
-      $scope.migrate.obdi_worker_check_availzone.state = "OK ("
-          + azstatus.AvailabilityZones[0].State + ")";
-      $scope.migrate.obdi_worker_check_availzone.message = "";
-      if( azstatus.AvailabilityZones[0].State != "available" ) {
-        $scope.migrate.obdi_worker_check_availzone.state = "NOT OK ("
-            + azstatus.AvailabilityZones[0].State + ")";
-        $scope.migrate.obdi_worker_check_availzone.message =
-            azstatus.AvailabilityZones[0].Messsages;
-        clearMessages();
-        $scope.message = "Error: Process was aborted. See below.";
-        return
-      }
-
-      // NEXT...
-
-    }).error( function(data,status) {
-      if (status>=500) {
-        $scope.login.errtext = "Server error.";
-        $scope.login.error = true;
-        $scope.login.pageurl = "login.html";
-      } else if (status==401) {
-        $scope.login.errtext = "Session expired.";
-        $scope.login.error = true;
-        $scope.login.pageurl = "login.html";
-      } else if (status>=400) {
-        clearMessages();
-        $scope.message = "Server said: " + data['Error'];
-        $scope.error = true;
-      } else if (status==0) {
-        // This is a guess really
-        $scope.login.errtext = "Could not connect to server.";
-        $scope.login.error = true;
-        $scope.login.pageurl = "login.html";
-      } else {
-        $scope.login.errtext = "Logged out due to an unknown error.";
-        $scope.login.error = true;
-        $scope.login.pageurl = "login.html";
-      }
-    });
-  };
-
-  // ----------------------------------------------------------------------
   $scope.Migrate_GetAvailZone = function( instance_id ) {
   // ----------------------------------------------------------------------
   // Runs the helloworld-runscript.sh script on the worker.
@@ -376,6 +305,309 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.login.pageurl = "login.html";
       } else if (status>=400) {
         clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_CheckAvailZone = function( ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    $scope.migrate.obdi_worker_check_availzone = {};
+    $scope.migrate.obdi_worker_check_availzone.status = "started";
+
+    $http({
+      method: 'GET',
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/describe-availability-zone?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + "&availability_zone="
+           + $scope.awsworker[0].Instances[0].AvailabilityZone
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        var azstatus = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      if( azstatus == null ) {
+        $scope.message = "Error: Could not get the status of the availability " +
+                         "zone the Obdi worker is in."
+      }
+
+      $scope.migrate.obdi_worker_check_availzone.status = "finished";
+      $scope.migrate.obdi_worker_check_availzone.state = "OK ("
+          + azstatus.AvailabilityZones[0].State + ")";
+      $scope.migrate.obdi_worker_check_availzone.message = "";
+      if( azstatus.AvailabilityZones[0].State != "available" ) {
+        $scope.migrate.obdi_worker_check_availzone.state = "NOT OK ("
+            + azstatus.AvailabilityZones[0].State + ")";
+        $scope.migrate.obdi_worker_check_availzone.message =
+            azstatus.AvailabilityZones[0].Messsages;
+        clearMessages();
+        $scope.message = "Error: Process was aborted. See below.";
+        return
+      }
+
+      $scope.Migrate_CreateVolume();
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_CreateVolume = function( ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    $scope.migrate.create_volume = {};
+    $scope.migrate.create_volume.status = "started";
+    $scope.migrate.create_volume.volumeid = "error";
+
+    var num = parseInt( $scope.datacopy.size_gb );
+
+    var params = {
+                   Size: num,
+                   VolumeType: "gp2"
+                 };
+
+    $http({
+      method: 'POST',
+      data: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/create-volume?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + "&availability_zone="
+           + $scope.awsworker[0].Instances[0].AvailabilityZone
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.ebsvolume = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      if( $scope.ebsvolume == null ) {
+        $scope.message = "Error: Create Volume returned no data. Check " +
+                         "to see if the volume was created and report this error."
+      }
+
+      $scope.migrate.create_volume.status = "finished";
+      $scope.migrate.create_volume.volumeid = $scope.ebsvolume.VolumeId;
+
+      // NEXT...
+      $scope.Migrate_WaitForVolume();
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_WaitForVolume = function( ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    var params = { "volume_id":[$scope.migrate.create_volume.volumeid] };
+
+    $scope.migrate.attach_volume = {};
+    $scope.migrate.attach_volume.status = "waiting";
+
+    $http({
+      method: 'GET',
+      params: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/describe-volumes?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.ebsvolumestatus = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      if( $scope.ebsvolumestatus == null ) {
+        $scope.message = "Error: Create Volume returned no data. Check " +
+                         "to see if the volume was created and report this error."
+      }
+
+      $scope.migrate.create_volume.status = "finished";
+      $scope.migrate.create_volume.volumeid = $scope.ebsvolume.VolumeId;
+
+      // NEXT...
+      if( $scope.ebsvolumestatus.Volumes[0].State == "available" ) {
+        $scope.Migrate_AttachVolume(0);
+      } else {
+        $scope.Migrate_WaitForVolume();
+      }
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_AttachVolume = function( i ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    $scope.migrate.attach_volume = {};
+    $scope.migrate.attach_volume.status = "started";
+    $scope.migrate.attach_volume.mountpoint = "error";
+
+    var letters=["b","c","d","e","f","g","h","i","j","k","l","m","n",
+                 "o","p","q","r","s","t","u","v","w","x","y","z"];
+
+    if( i >= letters.length ) {
+        $scope.message = "Error: Could not find any free mount points on "
+                       + $scope.awsdata.Aws_obdi_worker_instance_id + ". "
+                       + "You will need to delete the volume, "
+                       + $scope.migrate.create_volume.volumeid + ", "
+                       + "and free up a drive letter on "
+                       + $scope.awsdata.Aws_obdi_worker_instance_id + ".";
+        $scope.error = true;
+        return;
+    }
+
+    var params = {
+                   Device: "/dev/sd" + letters[i],
+                   InstanceId: $scope.awsdata.Aws_obdi_worker_instance_id,
+                   VolumeId: $scope.migrate.create_volume.volumeid
+                 };
+
+    $http({
+      method: 'POST',
+      data: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/attach-volume?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + "&availability_zone="
+           + $scope.awsworker[0].Instances[0].AvailabilityZone
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.attachvolume = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      if( $scope.attachvolume == null ) {
+        $scope.Migrate_AttachVolume(i+1);
+        /*
+        $scope.message = "Error: Attach Volume returned no data. Check " +
+                         "to see if the volume was created and report this error."
+        */
+      }
+
+      $scope.migrate.attach_volume.status = "finished";
+      $scope.migrate.attach_volume.mountpoint = $scope.attachvolume.Device;
+
+      // NEXT...
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==400) {
+        $scope.Migrate_AttachVolume(i+1);
+      } else if (status>=400) {
+        clearMessages();
+        $scope.migrate.attach_volume.status = "retrying";
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
       } else if (status==0) {
