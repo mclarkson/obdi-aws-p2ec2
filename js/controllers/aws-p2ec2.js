@@ -589,10 +589,11 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         */
       }
 
-      $scope.migrate.attach_volume.status = "finished";
+      $scope.migrate.attach_volume.status = "attaching";
       $scope.migrate.attach_volume.mountpoint = $scope.attachvolume.Device;
 
       // NEXT...
+      $scope.Migrate_WaitForAttach(0);
 
     }).error( function(data,status) {
       if (status>=500) {
@@ -608,6 +609,83 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       } else if (status>=400) {
         clearMessages();
         $scope.migrate.attach_volume.status = "retrying";
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_WaitForAttach = function( i ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    if( i > 50 ) {
+        $scope.message = "Error: Volume did not attach after "
+                       + i + " attempts. Monitor the volume,"
+                       + $scope.migrate.create_volume.volumeid + ", "
+                       + " on host "
+                       + $scope.awsdata.Aws_obdi_worker_instance_id
+                       + " using the AWS EC2 console, and delete"
+                       + "the volume.";
+        $scope.error = true;
+        return;
+    }
+
+    var params = { "volume_id":[$scope.migrate.create_volume.volumeid] };
+
+    $http({
+      method: 'GET',
+      params: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/describe-volumes?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.ebsvolumestatus = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      if( $scope.ebsvolumestatus == null ) {
+        $scope.message = "Error: Create Volume returned no data. Check " +
+                         "to see if the volume was created and report this error."
+      }
+
+      $scope.migrate.attach_volume.status = "finished";
+      $scope.migrate.attach_volume.mountpoint = $scope.attachvolume.Device;
+
+      // NEXT...
+      if( $scope.ebsvolumestatus.Volumes[0].Attachments[0].State != "attached" ) {
+        $scope.Migrate_WaitForAttach(i+1);
+      } else {
+        ;
+      }
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
       } else if (status==0) {

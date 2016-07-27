@@ -443,6 +443,13 @@
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
+      <div ng-if="migrate.attach_volume.status == 'attaching'">
+        <p class="col-sm-offset-4 col-sm-8">Waiting for attachment
+          {{migrate.attach_volume.mountpoint}}
+          to become ready
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
       <div ng-if="migrate.attach_volume.status == 'finished'">
         <p class="col-sm-offset-4 col-sm-8">Volume attached to
           {{awsdata.Aws_obdi_worker_instance_id}} at 
