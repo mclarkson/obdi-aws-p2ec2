@@ -1,16 +1,16 @@
 // Obdi - a REST interface and GUI for deploying software
 // Copyright (C) 2014  Mark Clarkson
-// 
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -502,6 +502,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
       // NEXT...
       if( $scope.ebsvolumestatus.Volumes[0].State == "available" ) {
+        $scope.migrate.attach_volume = {};
+        $scope.migrate.attach_volume.status = "started";
         $scope.Migrate_AttachVolume(0);
       } else {
         $scope.Migrate_WaitForVolume();
@@ -538,8 +540,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   // ----------------------------------------------------------------------
   // Runs the helloworld-runscript.sh script on the worker.
 
-    $scope.migrate.attach_volume = {};
-    $scope.migrate.attach_volume.status = "started";
     $scope.migrate.attach_volume.mountpoint = "error";
 
     var letters=["b","c","d","e","f","g","h","i","j","k","l","m","n",
@@ -605,10 +605,10 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.login.error = true;
         $scope.login.pageurl = "login.html";
       } else if (status==400) {
+        $scope.migrate.attach_volume.status = "retrying";
         $scope.Migrate_AttachVolume(i+1);
       } else if (status>=400) {
         clearMessages();
-        $scope.migrate.attach_volume.status = "retrying";
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
       } else if (status==0) {
@@ -672,7 +672,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       if( $scope.ebsvolumestatus.Volumes[0].Attachments[0].State != "attached" ) {
         $scope.Migrate_WaitForAttach(i+1);
       } else {
-        ;
+        $scope.Migrate_CopyFiles();
       }
 
     }).error( function(data,status) {
@@ -700,6 +700,69 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       }
     });
   };
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_CopyFiles = function( ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    $scope.migrate.copy_files = {};
+    $scope.migrate.copy_files.status = "started";
+
+    var num = parseInt( $scope.datacopy.size_gb );
+
+    var patharr = $scope.awsp2ec2_plugin.path.split('/');
+
+    $http({
+      method: 'POST',
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/rsyncbackup/remotecopy?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&task_id=" + $scope.awsp2ec2_plugin.taskId
+           + "&path=" + $scope.awsp2ec2_plugin.path
+           + "&mountdev=" + $scope.migrate.attach_volume.mountpoint
+           + "&mountdir=" + "/incoming/" + patharr[patharr.length-1]
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      $scope.message_jobid = data.JobId;
+      $scope.okmessage = "Copy files started.";
+      $scope.PollForJobFinish(data.JobId,1000,0,$scope.CopyFinished);
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.CopyFinished = function( id ) {
+  // ----------------------------------------------------------------------
+
+      $scope.migrate.copy_files.status = "finished";
+
+      // NEXT...
+  }
 
   // Polling functions
 
@@ -851,7 +914,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.notifyMe("Obdi job has finished.");
 
       $scope.datacopy.size_gb = Math.round(($scope.dirsize[0].sizeb)/1000/1000/1000) + 20;
-      
+
     }).error( function(data,status) {
       if (status>=500) {
         $scope.login.errtext = "Server error.";
@@ -918,7 +981,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       });
     }
 
-    // At last, if the user has denied notifications, and you 
+    // At last, if the user has denied notifications, and you
     // want to be respectful there is no need to bother them any more.
   }
 
@@ -956,7 +1019,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   // ----------------------------------------------------------------------
   $scope.CreateVolume = function( ) {
   // ----------------------------------------------------------------------
-  
+
     $timeout( function() {
       var box = $('#mainbtnblock');
       box.addClass('visuallyhidden');
@@ -1096,7 +1159,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         }).success( function(data, status, headers, config) {
           job = data[0];
           if(job.Status == 0 || job.Status == 1 || job.Status == 4) {
-            if( count > 1000 ) { // 1000 - usually 120, this could take long
+            if( count > 5000 ) { // 5000 - usually 120, this could take long
               clearMessages();
               $scope.message = "Job took too long. check job ID " +
                                + id + ", then try again.";

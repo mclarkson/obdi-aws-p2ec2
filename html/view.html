@@ -39,7 +39,7 @@
   <div class="row">
     <div class="col-lg-12">
       <h3 class="page-header" style="margin-bottom: -20px">
-        Amazon EC2 
+        Amazon EC2
       <button class="btn btn-sm btn-success pull-right" type="button"
         ng-if="create_volume"
         ng-click="Migrate()" style="margin-top: -5px; margin-right: 8px;">
@@ -64,6 +64,7 @@
   <div class="row">
     <div class="col-sm-12">
 
+      <!--
       <div class="alert alert-danger alert-dismissable" ng-show="message">
         <button type="button" class="close" data-dismiss="alert"
           aria-hidden="true">&times;</button>
@@ -73,6 +74,22 @@
         <button type="button" class="close" data-dismiss="alert"
           aria-hidden="true">&times;</button>
         {{okmessage}}
+      </div>
+      -->
+
+      <div class="alert alert-danger alert-dismissable" ng-show="message">
+        <button type="button" class="close" data-dismiss="alert"
+          aria-hidden="true">&times;</button>
+        {{message}}
+      </div>
+      <div class="alert alert-success alert-dismissable" ng-show="okmessage">
+        <button type="button" class="close" data-dismiss="alert"
+          aria-hidden="true">&times;</button>
+        {{okmessage}}
+        <span ng-if="message_jobid">
+        See: <a href="#" ng-click="showOutputlines(message_jobid)">
+        jobid:{{message_jobid}}</a>
+        </span>
       </div>
 
     </div>
@@ -124,7 +141,7 @@
 
 	  <div class="vbtn" style="margin-bottom: 8px">
 	    <div class="btn-group">
-	      <button type="button" class="btn btn-primary" style="margin-left: 8px;" 
+	      <button type="button" class="btn btn-primary" style="margin-left: 8px;"
 	      ng-click="ListInstances()" ng-disabled="btnlistInstancesDisabled">
 		List Instances
 	      </button>
@@ -133,7 +150,7 @@
 
 	  <div class="vbtn">
 	    <div class="btn-group">
-	      <button type="button" class="btn btn-primary" style="margin-left: 8px;" 
+	      <button type="button" class="btn btn-primary" style="margin-left: 8px;"
 	      ng-click="CreateVolume()" ng-disabled="btncreateVolumeDisabled">
 		Create Instance
 	      </button>
@@ -144,7 +161,7 @@
 	  <div class="vbtn">
 	    <div class="btn-group">
 	      <button type="button" class="btn btn-primary" uib-dropdown-toggle
-	      style="margin-left: 8px;" 
+	      style="margin-left: 8px;"
 	      ng-click="RunHelloScript()" ng-disabled="btncreateInstanceDisabled">
 		Create Instance
 	      </button>
@@ -242,7 +259,7 @@
             </span>
           </label>
 	  <div class="col-sm-9">
-	    <div class="btn-group">  
+	    <div class="btn-group">
 	      <button class="btn btn-primary" ng-click="CalcDirSize()">
 		Calculate Directory Size&nbsp;
 		<i class="fa fa-chevron-circle-right"> </i>
@@ -306,7 +323,7 @@
                 Root Disk Size
             </span>
           </label>
-            
+
           <div class="col-sm-3">
 	    <input class="form-control col-xs-3" id="size_gb"
 	      ng-model="datacopy.size_gb" placeholder="E.g. 10"
@@ -422,10 +439,13 @@
       </div>
       <div ng-if="migrate.create_volume.status == 'finished'">
         <p class="col-sm-4 right"><b>EBS Volume:</b>
-        <p class="col-sm-8">Volume created as 
+        <p class="col-sm-8">Volume created as
           {{migrate.create_volume.volumeid}}<br>
         </p>
       </div>
+
+      <!-- Attach Volume -->
+
       <div ng-if="migrate.attach_volume.status == 'waiting'">
         <p class="col-sm-offset-4 col-sm-8">Waiting for
           volume to become ready
@@ -434,12 +454,12 @@
       </div>
       <div ng-if="migrate.attach_volume.status == 'started'">
         <p class="col-sm-offset-4 col-sm-8">Attaching volume
-          failed. Trying another mount point
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
       <div ng-if="migrate.attach_volume.status == 'retrying'">
-        <p class="col-sm-offset-4 col-sm-8">Attaching volume to
+        <p class="col-sm-offset-4 col-sm-8">Attaching volume
+          failed. Trying another mount point
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
@@ -452,8 +472,22 @@
       </div>
       <div ng-if="migrate.attach_volume.status == 'finished'">
         <p class="col-sm-offset-4 col-sm-8">Volume attached to
-          {{awsdata.Aws_obdi_worker_instance_id}} at 
+          {{awsdata.Aws_obdi_worker_instance_id}} at
           {{migrate.attach_volume.mountpoint}}
+        </p>
+      </div>
+
+      <!-- Mount Volume and Copy Files -->
+
+      <div ng-if="migrate.copy_files.status == 'started'">
+        <p class="col-sm-4 right"><b>Copy Files:</b>
+        <p class="col-sm-8">Starting to copy files
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.copy_files.status == 'finished'">
+        <p class="col-sm-4 right"><b>Copy Files:</b>
+        <p class="col-sm-8">Files copied successfully
         </p>
       </div>
 
