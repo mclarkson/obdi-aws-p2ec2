@@ -91,3 +91,25 @@ $ curl -k "https://$ipport/api/nomen.nescio/$guid/aws-p2ec2/get-not-so-secret-da
 
 ```
 
+### osedits-centos6
+
+TODO: Document parameter options.
+
+TODO: Document req params for capability object.
+
+Edits Centos 6 OS.
+
+```
+# Log in
+
+$ ipport="127.0.0.1:443"
+
+$ guid=`curl -ks -d '{"Login":"nomen.nescio","Password":"password"}' \
+  https://$ipport/api/login | grep -o "[a-z0-9][^\"]*"`
+
+# Edit the OS
+
+$ curl -ks -X POST "https://$ipport/api/nomen.nescio/$guid/aws-p2ec2/osedits?env_id=1&task_id=1&path=/nosnap/centosbox004&force=true&umountdir=true"
+
+```
+

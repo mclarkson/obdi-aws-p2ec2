@@ -317,6 +317,8 @@ CHROOTDEV=$(echo "$LAST_STDOUT" | cut -d ' ' -f1)
 
 echo "> CHROOTDIR=$CHROOTDIR, CHROOTDEV=$CHROOTDEV"
 
+MOUNTDIR=$CHROOTDIR
+
 # unmount dev proc sys
 
 ssh_cmd $DESTSRV nosave \

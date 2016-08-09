@@ -128,9 +128,9 @@ func (t *Plugin) PostRequest(args *Args, response *[]byte) error {
 
 	// force is optional, '?force=xxx'
 
-	var force string
+	var force_str string
 	if len(args.QueryString["force"]) > 0 {
-		force = args.QueryString["force"][0]
+		force_str = args.QueryString["force"][0]
 	}
 
 	// mountdev is optional, '?mountdev=xxx'
@@ -226,6 +226,8 @@ func (t *Plugin) PostRequest(args *Args, response *[]byte) error {
 	end := strings.Split(strings.TrimRight(path_str, "/"), "/")
 	env_vars_str += space + `REMOTEDIR="/incoming/` + end[len(end)-1] + `"`
 
+	space = " "
+
 	// Get secret data from the AWS_ACCESS_KEY_ID_1 capability using sdtoken
 
 	envcaps := []EnvCap{}
@@ -308,6 +310,9 @@ func (t *Plugin) PostRequest(args *Args, response *[]byte) error {
 
 	// UMOUNTDIR
 	env_vars_str += space + `UMOUNTDIR="` + umountdir_str + `"`
+
+	// FORCE
+	env_vars_str += space + `FORCE="` + force_str + `"`
 
 	// Command arguments
 
