@@ -426,7 +426,12 @@ ssh_cmd $DESTSRV savestdout \
 	"$SUDO bash -c \"mount --bind /dev $CHROOTDIR/dev/ && mount --bind /proc/ $CHROOTDIR/proc/ && mount --bind /sys/ $CHROOTDIR/sys/\""
 
 ssh_cmd $DESTSRV savestdout \
-    "$SUDO chroot $CHROOTDIR /sbin/grub < <(echo -e \"device (hd0) $CHROOTDIR\\nroot (hd0,0)\\nsetup (hd0)\\nquit\")"
+    "$SUDO chroot $CHROOTDIR /sbin/grub < <(echo -e \"device (hd0) $CHROOTDEV\\nroot (hd0,0)\\nsetup (hd0)\\nquit\")"
+
+echo "$LAST_STDOUT"
+
+ssh_cmd $DESTSRV savestdout \
+    "$SUDO >$CHROOTDIR/etc/udev/rules.d/70-persistent-net.rules || true"
 
 ssh_cmd $DESTSRV savestdout \
     "$SUDO chroot $CHROOTDIR bash -c \"for i in /boot/initramfs*; do a=\\\${i%.img}; a=\\\${a#/boot/initramfs-}; dracut -f \\\$i \\\$a; done\""
