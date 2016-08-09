@@ -98,25 +98,25 @@ curl -k -d '{
 # Add the scripts, removing comment lines (#) and empty lines
 #
 
-#script="backup.sh"
-#
-#source=`sed '1n;/^\s*#/d;/^$/d;' scripts/$script | base64 -w 0`
-#
-#curl -k $proto://$ipport/api/admin/$guid/scripts?name=$script | tee $t
-#
-## Grab the id of the last insert
-#id=`grep Id $t | grep -Eo "[0-9]+"`
-#
-#if [[ -z $id ]]; then
-#	curl -k -d '{
-#		"Desc": "Rsync backup script. Only the verbose option, -V, is used here.",
-#		"Name": "'"$script"'",
-#		"Source": "'"$source"'"
-#	}' $proto://$ipport/api/admin/$guid/scripts
-#else
-#	curl -k -X PUT -d '{ "Source": "'"$source"'" }' \
-#	$proto://$ipport/api/admin/$guid/scripts/$id
-#fi
+script="aws-p2ec2-osedits.sh"
+
+source=`sed '1n;/^\s*#/d;/^$/d;' scripts/$script | base64 -w 0`
+
+curl -k $proto://$ipport/api/admin/$guid/scripts?name=$script | tee $t
+
+# Grab the id of the last insert
+id=`grep Id $t | grep -Eo "[0-9]+"`
+
+if [[ -z $id ]]; then
+	curl -k -d '{
+		"Desc": "Edit OS on mounted volume. See top of the file for options.",
+		"Name": "'"$script"'",
+		"Source": "'"$source"'"
+	}' $proto://$ipport/api/admin/$guid/scripts
+else
+	curl -k -X PUT -d '{ "Source": "'"$source"'" }' \
+	$proto://$ipport/api/admin/$guid/scripts/$id
+fi
 
 # --
 
