@@ -426,7 +426,7 @@ ssh_cmd $DESTSRV savestdout \
 	"$SUDO bash -c \"mount --bind /dev $CHROOTDIR/dev/ && mount --bind /proc/ $CHROOTDIR/proc/ && mount --bind /sys/ $CHROOTDIR/sys/\""
 
 ssh_cmd $DESTSRV savestdout \
-    "$SUDO chroot $CHROOTDIR /sbin/grub < <(echo -e \"device (hd0) $CHROOTDEV\\nroot (hd0,0)\\nsetup (hd0)\\nquit\")"
+    "$SUDO chroot $CHROOTDIR /sbin/grub < <(echo -e \"device (hd0) ${CHROOTDEV%[0-9]}\\nroot (hd0,0)\\nsetup (hd0)\\nquit\")"
 
 echo "$LAST_STDOUT"
 
