@@ -491,6 +491,20 @@
         </p>
       </div>
 
+      <!-- Edit OS Files -->
+
+      <div ng-if="migrate.osedits.status == 'started'">
+        <p class="col-sm-4 right"><b>Modify OS:</b>
+        <p class="col-sm-8">Modifying files
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.osedits.status == 'finished'">
+        <p class="col-sm-4 right"><b>Modify OS:</b>
+        <p class="col-sm-8">OS was modified without error
+        </p>
+      </div>
+
     </div>
   </div>
 

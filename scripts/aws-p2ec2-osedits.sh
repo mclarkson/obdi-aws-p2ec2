@@ -426,6 +426,9 @@ ssh_cmd $DESTSRV savestdout \
 	"$SUDO bash -c \"mount --bind /dev $CHROOTDIR/dev/ && mount --bind /proc/ $CHROOTDIR/proc/ && mount --bind /sys/ $CHROOTDIR/sys/\""
 
 ssh_cmd $DESTSRV savestdout \
+    "$SUDO chroot $CHROOTDIR /sbin/grub < <(echo -e \"device (hd0) $CHROOTDIR\\nroot (hd0,0)\\nsetup (hd0)\\nquit\")"
+
+ssh_cmd $DESTSRV savestdout \
     "$SUDO chroot $CHROOTDIR bash -c \"for i in /boot/initramfs*; do a=\\\${i%.img}; a=\\\${a#/boot/initramfs-}; dracut -f \\\$i \\\$a; done\""
 
 ssh_cmd $DESTSRV savestdout \

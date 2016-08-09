@@ -759,9 +759,61 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.CopyFinished = function( id ) {
   // ----------------------------------------------------------------------
 
-      $scope.migrate.copy_files.status = "finished";
+    $scope.migrate.copy_files.status = "finished";
 
-      // NEXT...
+    $scope.migrate.osedits = {};
+    $scope.migrate.osedits.status = "started";
+
+    var num = parseInt( $scope.datacopy.size_gb );
+
+    var patharr = $scope.awsp2ec2_plugin.path.split('/');
+
+    $http({
+      method: 'POST',
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-p2ec2/osedits?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&task_id=" + $scope.awsp2ec2_plugin.taskId
+           + "&path=" + $scope.awsp2ec2_plugin.path
+           + "&umountdir=true"
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      $scope.message_jobid = data.JobId;
+      $scope.okmessage = "Copy files started.";
+      $scope.PollForJobFinish(data.JobId,1000,0,$scope.ModifyOSFinished);
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  }
+
+  // ----------------------------------------------------------------------
+  $scope.ModifyOSFinished = function( id ) {
+  // ----------------------------------------------------------------------
+
+    $scope.migrate.osedits.status = "finished";
   }
 
   // Polling functions
