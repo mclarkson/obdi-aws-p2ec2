@@ -130,7 +130,7 @@ func (t *Plugin) PostRequest(args *Args, response *[]byte) error {
 
 	var force string
 	if len(args.QueryString["force"]) > 0 {
-		mountdev_str = args.QueryString["force"][0]
+		force = args.QueryString["force"][0]
 	}
 
 	// mountdev is optional, '?mountdev=xxx'
