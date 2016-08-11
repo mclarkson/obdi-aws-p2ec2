@@ -480,31 +480,94 @@
       <!-- Mount Volume and Copy Files -->
 
       <div ng-if="migrate.copy_files.status == 'started'">
-        <p class="col-sm-4 right"><b>Copy Files:</b>
+        <p class="col-sm-4 right"><b>Copy Files:</b></p>
         <p class="col-sm-8">Starting to copy files
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
       <div ng-if="migrate.copy_files.status == 'finished'">
-        <p class="col-sm-4 right"><b>Copy Files:</b>
-        <p class="col-sm-8">Files copied successfully
-        </p>
+        <p class="col-sm-4 right"><b>Copy Files:</b></p>
+        <p class="col-sm-8">Files copied successfully</p>
       </div>
 
       <!-- Edit OS Files -->
 
       <div ng-if="migrate.osedits.status == 'started'">
-        <p class="col-sm-4 right"><b>Modify OS:</b>
+        <p class="col-sm-4 right"><b>Modify OS:</b></p>
         <p class="col-sm-8">Modifying files
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
       <div ng-if="migrate.osedits.status == 'finished'">
-        <p class="col-sm-4 right"><b>Modify OS:</b>
+        <p class="col-sm-4 right"><b>Modify OS:</b></p>
         <p class="col-sm-8">OS was modified without error
         </p>
       </div>
 
+      <!-- Create Snapshot -->
+
+      <div ng-if="migrate.blah.status == 'started'">
+        <p class="col-sm-4 right"><b>Modify OS:</b></p>
+        <p class="col-sm-8">Modifying files
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.blah.status == 'finished'">
+        <p class="col-sm-4 right"><b>Modify OS:</b>
+        <p class="col-sm-8">OS was modified without error</p>
+      </div>
+
+      <!-- Create AMI -->
+
+      <div ng-if="migrate.blah.status == 'started'">
+        <p class="col-sm-4 right"><b>Modify OS:</b></p>
+        <p class="col-sm-8">Modifying files
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.blah.status == 'finished'">
+        <p class="col-sm-4 right"><b>Modify OS:</b></p>
+        <p class="col-sm-8">OS was modified without error</p>
+      </div>
+
+      <!-- Create Instance -->
+
+      <div ng-if="migrate.blah.status == 'started'">
+        <p class="col-sm-4 right"><b>Modify OS:</b></p>
+        <p class="col-sm-8">Modifying files
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.blah.status == 'finished'">
+        <p class="col-sm-4 right"><b>Modify OS:</b></p>
+        <p class="col-sm-8">OS was modified without error</p>
+      </div>
+
+      <!-- Create Instance -->
+
+      <div ng-if="migrate.detachvolume.status == 'started'">
+        <p class="col-sm-4 right"><b>Volume:</b></p>
+        <p class="col-sm-8">Detaching volume
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.detachvolume.status == 'detaching'">
+        <p class="col-sm-4 right"><b>Volume:</b></p>
+        <p class="col-sm-8">Waiting for detach to complete
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.detachvolume.status == 'finished'">
+        <p class="col-sm-4 right"><b>Volume:</b></p>
+        <p class="col-sm-8">Detached</p>
+      </div>
+
+      <!-- All Done -->
+
+      <div ng-if="migrate.migration.status == 'alldone'">
+        <p class="col-sm-4 right"><b>Migration:</b></p>
+        <p class="col-sm-8">COMPLETE!</p>
+      </div>
     </div>
   </div>
 

@@ -437,7 +437,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       $scope.migrate.create_volume.volumeid = $scope.ebsvolume.VolumeId;
 
       // NEXT...
-      $scope.Migrate_WaitForVolume();
+      $scope.Migrate_WaitForVolume( $scope.Migrate_AttachVolume );
 
     }).error( function(data,status) {
       if (status>=500) {
@@ -466,7 +466,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   };
 
   // ----------------------------------------------------------------------
-  $scope.Migrate_WaitForVolume = function( ) {
+  $scope.Migrate_WaitForVolume = function( nextfn ) {
   // ----------------------------------------------------------------------
   // Runs the helloworld-runscript.sh script on the worker.
 
@@ -504,9 +504,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       if( $scope.ebsvolumestatus.Volumes[0].State == "available" ) {
         $scope.migrate.attach_volume = {};
         $scope.migrate.attach_volume.status = "started";
-        $scope.Migrate_AttachVolume(0);
+        nextfn(0);
       } else {
-        $scope.Migrate_WaitForVolume();
+        $scope.Migrate_WaitForVolume( nextfn );
       }
 
     }).error( function(data,status) {
@@ -810,10 +810,87 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   }
 
   // ----------------------------------------------------------------------
-  $scope.ModifyOSFinished = function( id ) {
+  $scope.Migrate_DetachVolume = function( ) {
+  // ----------------------------------------------------------------------
+
+    $scope.migrate.detachvolume = {};
+    $scope.migrate.detachvolume.status = "started";
+
+    var params = {
+                   Device: $scope.migrate.attach_volume.mountpoint,
+                   InstanceId: $scope.awsdata.Aws_obdi_worker_instance_id,
+                   VolumeId: $scope.migrate.create_volume.volumeid
+                 };
+
+    $http({
+      method: 'POST',
+      data: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/attach-volume?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.detachvolume = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      $scope.migrate.detach_volume.status = "detaching";
+
+      // NEXT...
+      $scope.Migrate_WaitForVolume( Migrate_End );
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==400) {
+        $scope.migrate.attach_volume.status = "retrying";
+        $scope.Migrate_AttachVolume(i+1);
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  }
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_End = function( ) {
+  // ----------------------------------------------------------------------
+
+    $scope.migrate.migration.status = 'alldone';
+  }
+
+  // ----------------------------------------------------------------------
+  $scope.ModifyOSFinished = function( ) {
   // ----------------------------------------------------------------------
 
     $scope.migrate.osedits.status = "finished";
+    
+    // Create Volume - stop here.
+    // Create Snapshot, AMI or Instance, continue...
+
+    if( CreateWhat() == "Volume" )
+        $scope.Migrate_DetachVolume();
+
   }
 
   // Polling functions
