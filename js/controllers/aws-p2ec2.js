@@ -436,6 +436,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       $scope.migrate.create_volume.status = "finished";
       $scope.migrate.create_volume.volumeid = $scope.ebsvolume.VolumeId;
 
+      $scope.migrate.attach_volume = {};
+      $scope.migrate.attach_volume.status = "waiting";
+
       // NEXT...
       $scope.Migrate_WaitForVolume( $scope.Migrate_AttachVolume );
 
@@ -472,9 +475,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
     var params = { "volume_id":[$scope.migrate.create_volume.volumeid] };
 
-    $scope.migrate.attach_volume = {};
-    $scope.migrate.attach_volume.status = "waiting";
-
     $http({
       method: 'GET',
       params: params,
@@ -502,8 +502,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
       // NEXT...
       if( $scope.ebsvolumestatus.Volumes[0].State == "available" ) {
-        $scope.migrate.attach_volume = {};
-        $scope.migrate.attach_volume.status = "started";
         nextfn(0);
       } else {
         $scope.Migrate_WaitForVolume( nextfn );
@@ -540,6 +538,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   // ----------------------------------------------------------------------
   // Runs the helloworld-runscript.sh script on the worker.
 
+    $scope.migrate.attach_volume = {};
+    $scope.migrate.attach_volume.status = "started";
     $scope.migrate.attach_volume.mountpoint = "error";
 
     var letters=["b","c","d","e","f","g","h","i","j","k","l","m","n",
@@ -826,7 +826,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       method: 'POST',
       data: params,
       url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
-           + "/aws-ec2lib/attach-volume?env_id="
+           + "/aws-ec2lib/detach-volume?env_id="
            + $rootScope.awsp2ec2_plugin.envId
            + '&time='+new Date().getTime().toString()
     }).success( function(data, status, headers, config) {
@@ -838,10 +838,10 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.message = "Error: " + e;
       }
 
-      $scope.migrate.detach_volume.status = "detaching";
+      $scope.migrate.detachvolume.status = "detaching";
 
       // NEXT...
-      $scope.Migrate_WaitForVolume( Migrate_End );
+      $scope.Migrate_WaitForVolume( $scope.Migrate_End );
 
     }).error( function(data,status) {
       if (status>=500) {
@@ -852,9 +852,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.login.errtext = "Session expired.";
         $scope.login.error = true;
         $scope.login.pageurl = "login.html";
-      } else if (status==400) {
-        $scope.migrate.attach_volume.status = "retrying";
-        $scope.Migrate_AttachVolume(i+1);
       } else if (status>=400) {
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
@@ -876,6 +873,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.Migrate_End = function( ) {
   // ----------------------------------------------------------------------
 
+    $scope.migrate.migration = {};
+    $scope.migrate.detachvolume.status = 'finished';
     $scope.migrate.migration.status = 'alldone';
   }
 
@@ -888,7 +887,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     // Create Volume - stop here.
     // Create Snapshot, AMI or Instance, continue...
 
-    if( CreateWhat() == "Volume" )
+    if( $scope.CreateWhat() == "Volume" )
         $scope.Migrate_DetachVolume();
 
   }
