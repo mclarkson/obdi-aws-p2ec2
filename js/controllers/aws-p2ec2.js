@@ -771,7 +771,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $http({
       method: 'POST',
       url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
-           + "/aws-p2ec2/osedits?env_id="
+           + "/aws-p2ec2/osedits-centos6?env_id="
            + $rootScope.awsp2ec2_plugin.envId
            + "&task_id=" + $scope.awsp2ec2_plugin.taskId
            + "&path=" + $scope.awsp2ec2_plugin.path
