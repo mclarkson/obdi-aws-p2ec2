@@ -453,6 +453,13 @@ NM_CONTROLLED="yes"
 ONBOOT="yes"
 TYPE="Ethernet"
 GATEWAY=$GATEWAY
+# Extra options
+#USERCTL=yes
+#PEERDNS=yes
+#IPV6INIT=no
+#PERSISTENT_DHCLIENT=yes
+#RES_OPTIONS="timeout:2 attempts:5"
+#DHCP_ARP_CHECK=no
 EnD
 )
 
