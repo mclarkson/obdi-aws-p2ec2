@@ -53,6 +53,7 @@ Set the AWS_ACCESS_KEY_ID_1 json object in the environment, using the Admin inte
 
 *aws_obdi_worker_instance_id*
 > The AWS instance that contains the Obdi worker.
+> This AWS instance will be used to copy, mount and modify the backup image.
 
 *aws_obdi_worker_region*
 > The region the Obdi worker resides in.
