@@ -75,7 +75,7 @@ The following variables are used up until OS modifications by the Javascript/HTM
 > The global filter to apply, if any. For example, you might want to filter all
 > results by 'key-name=ourkeyname' or 'owner-id=25513944296'.
 
-The following variables are used when modifying the OS by the Bash script:
+The following variables are used by the Bash script when modifying the OS:
 
 *Aws_dnsserver_ip* and *Aws_dnsdomain*
 > Should both be set to avoid an error message. Affects the final '/etc/resolv.conf'.
