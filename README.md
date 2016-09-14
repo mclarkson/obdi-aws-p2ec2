@@ -33,40 +33,65 @@ will take the user to this plugin.
 Set the AWS_ACCESS_KEY_ID_1 json object in the environment, using the Admin interface.
 ```
 {
+    "Aws_access_key_id":"ALIENX2KD6OINVA510NQ",
+    "Aws_secret_access_key":"wHdlwoigU637fgnjAu+IRNVHfT-EXnIU5C2MbiQd",
+    "Aws_obdi_worker_instance_id":"i-e29eg362",
+    "Aws_obdi_worker_region":"us-east-1",
+    "Aws_obdi_worker_url":"https://1.2.3.4:4443/",
+    "Aws_obdi_worker_key":"secretkey",
+    "Aws_filter":"key-name=groupkey"
 
-    "aws_access_key_id":"ALIENX2KD6OINVA510NQ",
-    "aws_secret_access_key":"wHdlwoigU637fgnjAu+IRNVHfT-EXnIU5C2MbiQd",
-    "aws_obdi_worker_instance_id":"i-e29eg362",
-    "aws_obdi_worker_region":"us-east-1",
-    "aws_obdi_worker_url":"https://1.2.3.4:4443/",
-    "aws_obdi_worker_key":"secretkey",
-    "aws_filter":"key-name=groupkey"
-
+    "Aws_dnsserver_ip":"10.17.3.163",
+    "Aws_dnsdomain":"karmalab.net",
+    "Aws_gateway":"10.17.0.1",
+    "Aws_obdi_worker_ip":"172.31.16.14",
+    "Aws_shell_user_name":"centos",
+    "Aws_shell_ssh_key_b64":"LS0tLSTXdURGxLU...1ySBQUklWQVRFIEtFWS0tLS0t"
 }
 ```
 
-*aws_access_key_id*
+The following variables are used up until OS modifications by the Javascript/HTML code.
+
+*Aws_access_key_id*
 > AWS API access key ID
 
-*aws_secret_access_key*
+*Aws_secret_access_key*
 > AWS API password
 
-*aws_obdi_worker_instance_id*
+*Aws_obdi_worker_instance_id*
 > The AWS instance that contains the Obdi worker.
 > This AWS instance will be used to copy, mount and modify the backup image.
 
-*aws_obdi_worker_region*
+*Aws_obdi_worker_region*
 > The region the Obdi worker resides in.
 
-*aws_obdi_worker_url*
+*Aws_obdi_worker_url*
 > The URL used to access the Obdi worker.
 
-*aws_obdi_worker_key*
+*Aws_obdi_worker_key*
 > The password for the Obdi worker.
 
-*aws_filter*
+*Aws_filter*
 > The global filter to apply, if any. For example, you might want to filter all
 > results by 'key-name=ourkeyname' or 'owner-id=25513944296'.
+
+The following variables are used when modifying the OS by the Bash script:
+
+*Aws_dnsserver_ip* and *Aws_dnsdomain*
+> Should both be set to avoid an error message. Affects the final '/etc/resolv.conf'.
+
+*Aws_gateway*
+> Affects the networking in '/etc/sysconfig/network-scripts/ifcfg-eth0'.
+
+*Aws_obdi_worker_ip*
+> The IP address of the AWS instance, Aws_obdi_worker_instance_id. This is the address
+> as seen from the Backup server.
+
+*Aws_shell_user_name*
+> User name to use to connect to Aws_obdi_worker_ip using ssh.
+
+*Aws_shell_ssh_key_b64*
+> The base64 encoded key file.
 
 # Dev
 
