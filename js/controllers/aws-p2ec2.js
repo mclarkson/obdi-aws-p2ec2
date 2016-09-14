@@ -828,6 +828,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
            + "/aws-ec2lib/detach-volume?env_id="
            + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
            + '&time='+new Date().getTime().toString()
     }).success( function(data, status, headers, config) {
 
