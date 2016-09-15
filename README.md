@@ -39,7 +39,7 @@ Set the AWS_ACCESS_KEY_ID_1 json object in the environment, using the Admin inte
     "Aws_obdi_worker_region":"us-east-1",
     "Aws_obdi_worker_url":"https://1.2.3.4:4443/",
     "Aws_obdi_worker_key":"secretkey",
-    "Aws_filter":"key-name=groupkey"
+    "Aws_filter":"key-name=groupkey",
 
     "Aws_dnsserver_ip":"10.17.3.163",
     "Aws_dnsdomain":"karmalab.net",
