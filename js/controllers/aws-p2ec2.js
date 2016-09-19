@@ -780,7 +780,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     }).success( function(data, status, headers, config) {
 
       $scope.message_jobid = data.JobId;
-      $scope.okmessage = "Copy files started.";
+      $scope.okmessage = "Modify OS started.";
       $scope.PollForJobFinish(data.JobId,1000,0,$scope.ModifyOSFinished);
 
     }).error( function(data,status) {
