@@ -497,11 +497,10 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
                          "to see if the volume was created and report this error."
       }
 
-      $scope.migrate.create_volume.status = "finished";
-      $scope.migrate.create_volume.volumeid = $scope.ebsvolume.VolumeId;
-
       // NEXT...
       if( $scope.ebsvolumestatus.Volumes[0].State == "available" ) {
+        $scope.migrate.create_volume.status = "finished";
+        $scope.migrate.create_volume.volumeid = $scope.ebsvolume.VolumeId;
         nextfn(0);
       } else {
         $scope.Migrate_WaitForVolume( nextfn );
@@ -702,61 +701,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   };
 
   // ----------------------------------------------------------------------
-  $scope.Migrate_CopyFiles = function( ) {
-  // ----------------------------------------------------------------------
-  // Runs the helloworld-runscript.sh script on the worker.
-
-    $scope.migrate.copy_files = {};
-    $scope.migrate.copy_files.status = "started";
-
-    var num = parseInt( $scope.datacopy.size_gb );
-
-    var patharr = $scope.awsp2ec2_plugin.path.split('/');
-
-    $http({
-      method: 'POST',
-      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
-           + "/rsyncbackup/remotecopy?env_id="
-           + $rootScope.awsp2ec2_plugin.envId
-           + "&task_id=" + $scope.awsp2ec2_plugin.taskId
-           + "&path=" + $scope.awsp2ec2_plugin.path
-           + "&mountdev=" + $scope.migrate.attach_volume.mountpoint
-           + "&mountdir=" + "/incoming/" + patharr[patharr.length-1]
-           + '&time='+new Date().getTime().toString()
-    }).success( function(data, status, headers, config) {
-
-      $scope.message_jobid = data.JobId;
-      $scope.okmessage = "Copy files started.";
-      $scope.PollForJobFinish(data.JobId,1000,0,$scope.CopyFinished);
-
-    }).error( function(data,status) {
-      if (status>=500) {
-        $scope.login.errtext = "Server error.";
-        $scope.login.error = true;
-        $scope.login.pageurl = "login.html";
-      } else if (status==401) {
-        $scope.login.errtext = "Session expired.";
-        $scope.login.error = true;
-        $scope.login.pageurl = "login.html";
-      } else if (status>=400) {
-        clearMessages();
-        $scope.message = "Server said: " + data['Error'];
-        $scope.error = true;
-      } else if (status==0) {
-        // This is a guess really
-        $scope.login.errtext = "Could not connect to server.";
-        $scope.login.error = true;
-        $scope.login.pageurl = "login.html";
-      } else {
-        $scope.login.errtext = "Logged out due to an unknown error.";
-        $scope.login.error = true;
-        $scope.login.pageurl = "login.html";
-      }
-    });
-  };
-
-  // ----------------------------------------------------------------------
-  $scope.CopyFinished = function( id ) {
+  $scope.Migrate_CopyFinished = function( id ) {
   // ----------------------------------------------------------------------
 
     $scope.migrate.copy_files.status = "finished";
@@ -781,7 +726,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
       $scope.message_jobid = data.JobId;
       $scope.okmessage = "Modify OS started.";
-      $scope.PollForJobFinish(data.JobId,1000,0,$scope.ModifyOSFinished);
+      $scope.PollForJobFinish(data.JobId,1000,0,$scope.Migrate_DetachVolume);
 
     }).error( function(data,status) {
       if (status>=500) {
@@ -808,6 +753,60 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       }
     });
   }
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_CopyFiles = function( ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    $scope.migrate.copy_files = {};
+    $scope.migrate.copy_files.status = "started";
+
+    var num = parseInt( $scope.datacopy.size_gb );
+
+    var patharr = $scope.awsp2ec2_plugin.path.split('/');
+
+    $http({
+      method: 'POST',
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/rsyncbackup/remotecopy?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&task_id=" + $scope.awsp2ec2_plugin.taskId
+           + "&path=" + $scope.awsp2ec2_plugin.path
+           + "&mountdev=" + $scope.migrate.attach_volume.mountpoint
+           + "&mountdir=" + "/incoming/" + patharr[patharr.length-1]
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      $scope.message_jobid = data.JobId;
+      $scope.okmessage = "Copy files started.";
+      $scope.PollForJobFinish(data.JobId,1000,0,$scope.Migrate_CopyFinished);
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
 
   // ----------------------------------------------------------------------
   $scope.Migrate_DetachVolume = function( ) {
@@ -839,10 +838,79 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.message = "Error: " + e;
       }
 
+      $scope.migrate.osedits.status = "finished";
       $scope.migrate.detachvolume.status = "detaching";
 
       // NEXT...
-      $scope.Migrate_WaitForVolume( $scope.Migrate_End );
+
+      $scope.Migrate_WaitForVolume( $scope.Migrate_CreateSnapshot );
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  }
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_CreateSnapshot = function( ) {
+  // ----------------------------------------------------------------------
+
+    $scope.migrate.detachvolume.status = 'finished';
+
+    if( CreateWhat() == "Volume" ) $scope.Migrate_End();
+
+    $scope.migrate.snapshot = {};
+    $scope.migrate.snapshot.status = "started";
+
+    var params = {
+                   Description: "Created by obdi-aws-p2ec2 for " +
+                                $scope.migrate.create_volume.volumeid,
+                   VolumeId: $scope.migrate.create_volume.volumeid
+                 };
+
+    $http({
+      method: 'POST',
+      data: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/create-snapshot?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.snapshot = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      $scope.migrate.snapshot.status = "finished";
+      $scope.migrate.snapshot.snapshotid = $scope.snapshot.SnapshotId;
+
+      // NEXT...
+      //$scope.Migrate_WaitForVolume( $scope.Migrate_End );
+      $scope.Migrate_End();
 
     }).error( function(data,status) {
       if (status>=500) {
@@ -875,22 +943,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   // ----------------------------------------------------------------------
 
     $scope.migrate.migration = {};
-    $scope.migrate.detachvolume.status = 'finished';
     $scope.migrate.migration.status = 'alldone';
-  }
-
-  // ----------------------------------------------------------------------
-  $scope.ModifyOSFinished = function( ) {
-  // ----------------------------------------------------------------------
-
-    $scope.migrate.osedits.status = "finished";
-    
-    // Create Volume - stop here.
-    // Create Snapshot, AMI or Instance, continue...
-
-    if( $scope.CreateWhat() == "Volume" )
-        $scope.Migrate_DetachVolume();
-
   }
 
   // Polling functions
