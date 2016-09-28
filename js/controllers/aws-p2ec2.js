@@ -30,6 +30,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.notifyme = {};
   $scope.notifyme.now = false;
   $scope.datacopy = {};
+  $scope.datacopy.wants_instance = false;
+  $scope.datacopy.wants_ami = false;
+  $scope.datacopy.wants_snapshot = false;
   $scope.dirsize = {};
   $scope.migrate = {};
 
@@ -108,6 +111,10 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.dirsize_in_progress = false;
     $scope.dirsize_complete = false;
     $scope.migrate.page = false;
+    $scope.datacopy = {};
+    $scope.datacopy.wants_instance = false;
+    $scope.datacopy.wants_ami = false;
+    $scope.datacopy.wants_snapshot = false;
 
     var box = $('#mainbtnblock');
     box.removeClass('visuallyhidden');
@@ -812,6 +819,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.Migrate_DetachVolume = function( ) {
   // ----------------------------------------------------------------------
 
+    $scope.migrate.osedits.status = "finished";
     $scope.migrate.detachvolume = {};
     $scope.migrate.detachvolume.status = "started";
 
@@ -838,7 +846,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.message = "Error: " + e;
       }
 
-      $scope.migrate.osedits.status = "finished";
       $scope.migrate.detachvolume.status = "detaching";
 
       // NEXT...
@@ -877,7 +884,10 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
     $scope.migrate.detachvolume.status = 'finished';
 
-    if( CreateWhat() == "Volume" ) $scope.Migrate_End();
+    if( $scope.CreateWhat() == "Volume" ) {
+        $scope.Migrate_End();
+        return;
+    }
 
     $scope.migrate.snapshot = {};
     $scope.migrate.snapshot.status = "started";
@@ -905,8 +915,138 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.message = "Error: " + e;
       }
 
-      $scope.migrate.snapshot.status = "finished";
+      $scope.migrate.snapshot.status = "checking";
       $scope.migrate.snapshot.snapshotid = $scope.snapshot.SnapshotId;
+
+      // NEXT...
+      $scope.Migrate_WaitForSnapshot( $scope.Migrate_CreateAMI );
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  }
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_WaitForSnapshot = function( nextfn ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    var params = { "snapshot_id":[$scope.migrate.snapshot.snapshotid] };
+
+    $http({
+      method: 'GET',
+      params: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/describe-snapshots?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.snapshotstatus = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      if( $scope.snapshotstatus == null ) {
+        $scope.message = "Error: describe-snapshot returned no data. Check " +
+                         "to see if the snapshot was created and report this error."
+      }
+
+      // NEXT...
+      if( $scope.snapshotstatus.Snapshots[0].State == "completed" ) {
+        $scope.migrate.snapshot.status = "finished";
+        nextfn(0);
+      } else {
+        $scope.Migrate_WaitForSnapshot( nextfn );
+      }
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_CreateAMI = function( ) {
+  // ----------------------------------------------------------------------
+
+    if( $scope.CreateWhat() == "Snapshot" ) {
+        $scope.Migrate_End();
+        return;
+    }
+
+    $scope.migrate.ami = {};
+    $scope.migrate.ami.status = "started";
+
+    var params = {
+                   Description: "Created by obdi-aws-p2ec2 for " +
+                                $scope.migrate.create_volume.volumeid,
+                   VolumeId: $scope.migrate.create_volume.volumeid
+                 };
+
+    $http({
+      method: 'POST',
+      data: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/register-image?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.ami = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      $scope.migrate.ami.status = "finished";
+      $scope.migrate.ami.amiid = $scope.ami.AmiId;
 
       // NEXT...
       //$scope.Migrate_WaitForVolume( $scope.Migrate_End );

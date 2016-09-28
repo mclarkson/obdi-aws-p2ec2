@@ -532,6 +532,11 @@
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
+      <div ng-if="migrate.snapshot.status == 'checking'">
+        <p class="col-sm-4 right"><b>Snapshot:</b>
+        <p class="col-sm-8">Waiting for snapshot creation to complete
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+      </div>
       <div ng-if="migrate.snapshot.status == 'finished'">
         <p class="col-sm-4 right"><b>Snapshot:</b>
         <p class="col-sm-8">Created as {{migrate.snapshot.snapshotid}}</p>
@@ -539,15 +544,15 @@
 
       <!-- Create AMI -->
 
-      <div ng-if="migrate.blah.status == 'started'">
-        <p class="col-sm-4 right"><b>Modify OS:</b></p>
-        <p class="col-sm-8">Modifying files
+      <div ng-if="migrate.ami.status == 'started'">
+        <p class="col-sm-4 right"><b>AMI:</b></p>
+        <p class="col-sm-8">Creating AMI
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
       <div ng-if="migrate.blah.status == 'finished'">
-        <p class="col-sm-4 right"><b>Modify OS:</b></p>
-        <p class="col-sm-8">OS was modified without error</p>
+        <p class="col-sm-4 right"><b>AMI:</b></p>
+        <p class="col-sm-8">Created as {{migrate.ami.amiid}}</p>
       </div>
 
       <!-- Create Instance -->
