@@ -523,6 +523,10 @@
         <p class="col-sm-4 right"><b>Volume:</b></p>
         <p class="col-sm-8">Detached</p>
       </div>
+      <div ng-if="migrate.detachvolume.status == 'deleted'">
+        <p class="col-sm-4 right"><b>Volume:</b></p>
+        <p class="col-sm-8">Deleted!</p>
+      </div>
 
       <!-- Create Snapshot -->
 
@@ -550,7 +554,7 @@
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
-      <div ng-if="migrate.blah.status == 'finished'">
+      <div ng-if="migrate.ami.status == 'finished'">
         <p class="col-sm-4 right"><b>AMI:</b></p>
         <p class="col-sm-8">Created as {{migrate.ami.amiid}}</p>
       </div>

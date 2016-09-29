@@ -978,8 +978,28 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
       // NEXT...
       if( $scope.snapshotstatus.Snapshots[0].State == "completed" ) {
+
         $scope.migrate.snapshot.status = "finished";
+
+        data = { DryRun: false,
+                 VolumeId: $scope.migrate.create_volume.volumeid
+               }
+
+        // Sneakily delete the volume
+        $http({
+          method: 'POST',
+          data: data,
+          url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+               + "/aws-ec2lib/delete-volume?env_id="
+               + $rootScope.awsp2ec2_plugin.envId
+               + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+               + '&time='+new Date().getTime().toString()
+        }).success( function(data, status, headers, config) {
+            $scope.migrate.detachvolume.status = "deleted";
+        }); // Ignore the error (FIXME)
+
         nextfn(0);
+
       } else {
         $scope.Migrate_WaitForSnapshot( nextfn );
       }
@@ -1022,11 +1042,22 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.migrate.ami = {};
     $scope.migrate.ami.status = "started";
 
-    var params = {
-                   Description: "Created by obdi-aws-p2ec2 for " +
-                                $scope.migrate.create_volume.volumeid,
-                   VolumeId: $scope.migrate.create_volume.volumeid
-                 };
+    var params = { Name: "AMI-"+$scope.migrate.snapshot.snapshotid,
+                   Description: "Created by obdi-aws-p2ec2 from " +
+                                $scope.migrate.snapshot.snapshotid,
+                   RootDeviceName: "sda1",
+                   VirtualizationType: "hvm",
+                   BlockDeviceMappings: [
+                   {
+                       DeviceName: "sda1",
+                       Ebs: {
+                           DeleteOnTermination: true,
+                           SnapshotId: $scope.snapshot.SnapshotId,
+                           VolumeSize: $scope.datacopy.size_gb,
+                           VolumeType: "gp2"
+                       }
+                   }]
+    };
 
     $http({
       method: 'POST',
@@ -1046,7 +1077,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       }
 
       $scope.migrate.ami.status = "finished";
-      $scope.migrate.ami.amiid = $scope.ami.AmiId;
+      $scope.migrate.ami.amiid = $scope.ami.ImageId;
 
       // NEXT...
       //$scope.Migrate_WaitForVolume( $scope.Migrate_End );
