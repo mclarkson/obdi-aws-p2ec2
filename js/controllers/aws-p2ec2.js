@@ -1130,11 +1130,11 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         "SecurityGroups": $scope.awsdata.Aws_securitygroups,
         "BlockDeviceMappings":[
             {
-                "DeviceName":"sda1",
+                "DeviceName": "sda1",
                 "Ebs":{
                     "DeleteOnTermination":true,
-                    "VolumeSize":21,
-                    "VolumeType":"gp2"
+                    "VolumeSize": $scope.datacopy.size_gb,
+                    "VolumeType": "gp2"
                  }
              }
         ]
