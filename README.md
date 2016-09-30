@@ -14,11 +14,16 @@ Known Users: [obdi-rsyncbackup](https://github.com/mclarkson/obdi-rsyncbackup)
 
 # What is it?
 
+This plugin writes files to a volume mounted into AWS management instance
+ultimately creating a new AWS instance from those files.
+
 No entry is made in the sidebar for this plugin since this plugin is accessed
-from other compatible plugins. For example, when this plugin is installed, the
-obdi-rsyncbackup plugin will show a 'Create Amazon EC2 Instance' button in the
-file viewer when it thinks it has found a root filesystem. Pressing the button
-will take the user to this plugin.
+from other compatible plugins.
+
+For example, when this plugin is installed, the obdi-rsyncbackup plugin will
+show a 'Create Amazon EC2 Instance' button in the file viewer when it thinks it
+has found a root filesystem. Pressing the button will take the user to this
+plugin and allow them to create an Amazon Virtual Machine.
 
 # Installation
 
