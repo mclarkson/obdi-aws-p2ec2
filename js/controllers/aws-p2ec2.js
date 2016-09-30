@@ -1133,7 +1133,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
                 "DeviceName": "sda1",
                 "Ebs":{
                     "DeleteOnTermination":true,
-                    "VolumeSize": $scope.datacopy.size_gb,
+                    "VolumeSize": parseint($scope.datacopy.size_gb),
                     "VolumeType": "gp2"
                  }
              }
