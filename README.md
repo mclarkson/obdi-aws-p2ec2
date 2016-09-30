@@ -40,6 +40,7 @@ Set the AWS_ACCESS_KEY_ID_1 json object in the environment, using the Admin inte
     "Aws_obdi_worker_url":"https://1.2.3.4:4443/",
     "Aws_obdi_worker_key":"secretkey",
     "Aws_filter":"key-name=groupkey",
+    "Aws_keyname":"groupkey",
 
     "Aws_dnsserver_ip":"10.17.3.163",
     "Aws_dnsdomain":"karmalab.net",
@@ -74,6 +75,13 @@ The following variables are used up until OS modifications by the Javascript/HTM
 *Aws_filter*
 > The global filter to apply, if any. For example, you might want to filter all
 > results by 'key-name=ourkeyname' or 'owner-id=25513944296'.
+
+*Aws_keyname*
+> The key name used when creating a new EC2 Instance.
+
+*Aws_securitygroups*
+> List of security group names (not IDs) that instances will belong to when
+> creating a new EC2 Instance.
 
 The following variables are used by the Bash script when modifying the OS:
 

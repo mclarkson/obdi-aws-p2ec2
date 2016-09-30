@@ -163,13 +163,15 @@ func (t *Plugin) GetRequest(args *Args, response *[]byte) error {
 	}
 
 	type AWSData struct {
-		Aws_access_key_id           string // E.g. OKLAJX2KN6OXZEFV4B1Q
-		Aws_secret_access_key       string // E.g. oiwjeg^laGDIUsg@jfa
-		Aws_obdi_worker_instance_id string // E.g. i-e19ec362
-		Aws_obdi_worker_region      string // E.g. us-east-1
-		Aws_obdi_worker_url         string // E.g. https://1.2.3.4:4443/
-		Aws_obdi_worker_key         string // E.g. secretkey
-		Aws_filter                  string // E.g. key-name=itsupkey
+		Aws_access_key_id           string   // E.g. OKLAJX2KN6OXZEFV4B1Q
+		Aws_secret_access_key       string   // E.g. oiwjeg^laGDIUsg@jfa
+		Aws_obdi_worker_instance_id string   // E.g. i-e19ec362
+		Aws_obdi_worker_region      string   // E.g. us-east-1
+		Aws_obdi_worker_url         string   // E.g. https://1.2.3.4:4443/
+		Aws_obdi_worker_key         string   // E.g. secretkey
+		Aws_filter                  string   // E.g. key-name=itsupkey
+		Aws_keyname                 string   // E.g. itsupkey
+		Aws_securitygroups          []string // E.g. sgroup1
 	}
 
 	awsdata := AWSData{}

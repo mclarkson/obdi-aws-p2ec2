@@ -561,15 +561,15 @@
 
       <!-- Create Instance -->
 
-      <div ng-if="migrate.blah.status == 'started'">
-        <p class="col-sm-4 right"><b>Modify OS:</b></p>
-        <p class="col-sm-8">Modifying files
+      <div ng-if="migrate.instance.status == 'started'">
+        <p class="col-sm-4 right"><b>Instance:</b></p>
+        <p class="col-sm-8">Creating instance
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
         </p>
       </div>
-      <div ng-if="migrate.blah.status == 'finished'">
-        <p class="col-sm-4 right"><b>Modify OS:</b></p>
-        <p class="col-sm-8">OS was modified without error</p>
+      <div ng-if="migrate.instance.status == 'finished'">
+        <p class="col-sm-4 right"><b>Instance:</b></p>
+        <p class="col-sm-8">Instance {{migrate.instance.instanceid}} created</p>
       </div>
 
       <!-- All Done -->

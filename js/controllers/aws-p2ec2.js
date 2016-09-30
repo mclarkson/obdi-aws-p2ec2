@@ -985,7 +985,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
                  VolumeId: $scope.migrate.create_volume.volumeid
                }
 
-        // Sneakily delete the volume
+        // Sneakily delete the volume here
         $http({
           method: 'POST',
           data: data,
@@ -1078,6 +1078,87 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
       $scope.migrate.ami.status = "finished";
       $scope.migrate.ami.amiid = $scope.ami.ImageId;
+
+      // NEXT...
+      //$scope.Migrate_WaitForVolume( $scope.Migrate_End );
+      $scope.Migrate_CreateInstance();
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  }
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_CreateInstance = function( ) {
+  // ----------------------------------------------------------------------
+
+    if( $scope.CreateWhat() == "AMI" ) {
+        $scope.Migrate_End();
+        return;
+    }
+
+    $scope.migrate.instance = {};
+    $scope.migrate.instance.status = "started";
+
+    var params = {
+        "ImageId": $scope.migrate.ami.amiid,
+        "InstanceType": $scope.datacopy.instance_type,
+        "MaxCount": 1,
+        "MinCount": 1,
+        "KeyName": $scope.awsdata.Aws_keyname,
+        "SecurityGroups": $scope.awsdata.Aws_securitygroups,
+        "BlockDeviceMappings":[
+            {
+                "DeviceName":"sda1",
+                "Ebs":{
+                    "DeleteOnTermination":true,
+                    "VolumeSize":21,
+                    "VolumeType":"gp2"
+                 }
+             }
+        ]
+    };
+
+    $http({
+      method: 'POST',
+      data: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/run-instances?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.instance = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      $scope.migrate.instance.status = "finished";
+      $scope.migrate.instance.instanceid = $scope.instance.Instances[0].InstanceId;
 
       // NEXT...
       //$scope.Migrate_WaitForVolume( $scope.Migrate_End );
@@ -1389,7 +1470,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.create_volume = true;
 
     $scope.datacopy = {};
-    $scope.datacopy.instance_type = "t1.micro";
+    $scope.datacopy.instance_type = "t2.micro";
   };
 
   // ----------------------------------------------------------------------
