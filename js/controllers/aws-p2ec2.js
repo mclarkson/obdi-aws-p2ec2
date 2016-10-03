@@ -1053,7 +1053,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
                        Ebs: {
                            DeleteOnTermination: true,
                            SnapshotId: $scope.snapshot.SnapshotId,
-                           VolumeSize: $scope.datacopy.size_gb,
+                           VolumeSize: parseInt($scope.datacopy.size_gb),
                            VolumeType: "gp2"
                        }
                    }]

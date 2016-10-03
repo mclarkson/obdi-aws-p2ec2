@@ -42,6 +42,7 @@
         Amazon EC2
       <button class="btn btn-sm btn-success pull-right" type="button"
         ng-if="create_volume"
+        ng-disabled="!(typeof(datacopy.size_gb) != 'undefined' && datacopy.size_gb>0)"
         ng-click="Migrate()" style="margin-top: -5px; margin-right: 8px;">
         <i class="fa fa-check"> </i> Create {{CreateWhat()}}</button>
       <button class="btn btn-sm btn-success pull-right" type="button"
@@ -111,6 +112,11 @@
 
     .visuallyhidden {
       max-height: 0;
+    }
+
+    h4 > a {
+      font-size: smaller;
+      font-weight: bold;
     }
   </style>
 
@@ -233,8 +239,12 @@
     <div class="col-sm-12" id="crvol">
       <h4 class="page-header">AWS Region: {{region.Name}} - Create Instance</h4>
 
-      <!--<p>Set EBS volume size:</p>-->
+      <p>Start by pressing the blue Calculate Directory Size button or enter
+         the size (in GB) yourself in the Customise Root Disk section.</p>
+
       <div class="form-horizontal prepend-xs-1" role="form">
+
+      <!-- CALC DIR SIZE BUTTON  -->
 
       <!-- TODO TODO
            Calculate Directory Size box should only be shown when
@@ -251,10 +261,11 @@
               popover-append-to-body="true"
               uib-popover="Press the Calculate Directory Size button to calculate
                            the size of the directory that will be written to
-                           Amazon EC2. Select 'Notify me when done' to get a
-                           system notification when the calculation is complete.
-                           The Root Disk Size field, below, will be updated
-                           with the calculated size plus 20 GB.">
+                           Amazon EC2. Select 'Notify when size calculation
+                           is complete' to get a system notification when the
+                           calculation is complete.  The Root Disk Size field,
+                           below, will be updated with the calculated size plus
+                           20 GB.">
               Size Query
             </span>
           </label>
@@ -283,97 +294,127 @@
             <div class="checkbox">
               <label>
                 <input type="checkbox" ng-model="notifyme.now">
-                Notify me when done
+                Notify when size calculation is complete
               </label>
             </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="size_gb" class="col-sm-3 control-label">
-            <span class="mypopover"
-              popover-trigger="mouseenter mouseleave"
-              popover-title="Instance Type"
-              popover-placement="right"
-              popover-append-to-body="true"
-              uib-popover="The instance type will be used if the Create Instance
-                           option is selected. This can be changed by clicking
-                           the Customise Instance button below.">
-              Instance Type
-            </span>
-          </label>
-          <div class="col-sm-5">
-            <input class="form-control col-xs-5" id="size_gb"
-              ng-model="datacopy.instance_type" placeholder="" type="text"
-              ng-trim='false' ng-disabled="true" required>
-          </div>
-        </div>
+        <!-- ACCORDIONS  -->
 
-        <div class="form-group">
-          <label for="size_gb" class="col-sm-3 control-label">
-            <span class="mypopover"
-              popover-trigger="mouseenter mouseleave"
-              popover-title="Root Disk Size"
-              popover-placement="right"
-              popover-append-to-body="true"
-              uib-popover="The size of the Root Disk, /dev/sda or /dev/xvda, is
-                           specified here. Enter an integer. Click the Customise
-                           Root Disk button to set other EBS volume options for
-                           this disk.">
-                Root Disk Size
-            </span>
-          </label>
+        <label for="rsync_opts" class="col-sm-3 control-label">
+          <span class="mypopover"
+            popover-trigger="mouseenter mouseleave"
+            popover-title="Size Query"
+            popover-placement="right"
+            popover-append-to-body="true"
+            uib-popover="Expand the relevant control to customise the root disk
+                         or to customise the instance.">
+            Customisations
+          </span>
+        </label>
 
-          <div class="col-sm-3">
-            <input class="form-control col-xs-3" id="size_gb"
-              ng-model="datacopy.size_gb" placeholder="E.g. 10"
-              type="text" ng-trim='false' required>
-          </div>
-          <!--
-          <div class="col-sm-3" style="padding-left:0;">
-            <p style="padding-top: 7px;">GB</p>
-          </div>
-          -->
-        </div>
+        <uib-accordion class="col-sm-8" close-others="true"
+        style="padding-left: 8px; padding-right: 8px; padding-top: 10px; margin-bottom: -12px">
 
-        <div class="form-group">
-          <div class="col-sm-offset-3 col-sm-3">
-            <button style="" class="btn btn-default" type="button">
-              <i class="fa fa-cog"></i> Customise Root Disk
-            </button>
+          <div uib-accordion-group class="panel-default" is-open="status.crdopen">
+            <uib-accordion-heading>
+              Customise Root Disk
+              <i class="pull-right glyphicon"
+                ng-class="{'glyphicon-chevron-down': status.crdopen,
+                  'glyphicon-chevron-right': !status.crdopen}"></i>
+            </uib-accordion-heading>
+            <div class="form-group">
+              <label for="size_gb" class="col-sm-5 control-label">
+                <span class="mypopover"
+                  popover-trigger="mouseenter mouseleave"
+                  popover-title="Root Disk Size"
+                  popover-placement="right"
+                  popover-append-to-body="true"
+                  uib-popover="The size of the Root Disk, /dev/sda or /dev/xvda, is
+                               specified here. Enter an integer. Click the Customise
+                               Root Disk button to set other EBS volume options for
+                               this disk.">
+                    Root Disk Size
+                </span>
+              </label>
+              <div class="col-sm-5">
+                <input class="form-control col-xs-3" id="size_gb"
+                  ng-model="datacopy.size_gb" placeholder="E.g. 10"
+                  type="text" ng-trim='false' required>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <div class="col-sm-offset-3 col-sm-3">
-            <button style="" class="btn btn-default" type="button">
-              <i class="fa fa-cog"></i> Customise Instance
-            </button>
+          <div uib-accordion-group class="panel-default" is-open="status.ciopen"
+           is-disabled="!datacopy.wants_instance">
+            <uib-accordion-heading>
+              Customise Instance
+              <i class="pull-right glyphicon"
+                ng-class="{'glyphicon-chevron-down': status.ciopen,
+                  'glyphicon-chevron-right': !status.ciopen}"></i>
+            </uib-accordion-heading>
+            <div class="form-group">
+              <label for="size_gb" class="col-sm-5 control-label">
+                <span class="mypopover"
+                  popover-trigger="mouseenter mouseleave"
+                  popover-title="Instance Type"
+                  popover-placement="right"
+                  popover-append-to-body="true"
+                  uib-popover="The instance type will be used if the Create Instance
+                               option is selected. This can be changed by clicking
+                               the Customise Instance button below.">
+                  Instance Type
+                </span>
+              </label>
+              <div class="col-sm-7">
+                <input class="form-control col-xs-7" id="size_gb"
+                  ng-model="datacopy.instance_type" placeholder="" type="text"
+                  ng-trim='false' ng-disabled="true" required>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="col-sm-offset-3 col-sm-7">
-          <div class="checkbox" style="padding-top: 0px;">
+        </uib-accordion>
+
+        <!-- CREATE CHECKBOXES -->
+
+        <label for="rsync_opts" class="col-sm-3 control-label">
+          <span class="mypopover"
+            popover-trigger="mouseenter mouseleave"
+            popover-title="Size Query"
+            popover-placement="right"
+            popover-append-to-body="true"
+            uib-popover="Choose what type of image to create. A volume is created
+            in the availability zone of the Obdi worker, a snapshot is created from
+            the volume and is saved in S3. An AMI is created in the current region.
+            An instance can be created in any availability zone in the current region.">
+            Create
+          </span>
+        </label>
+
+        <div class="col-sm-8" style="padding-left:6px;">
+          <div class="checkbox">
             <label>
               <input type="checkbox" ng-model="datacopy.wants_snapshot"
               ng-disabled="datacopy.wants_ami">
-              Create snapshot
+              Snapshot
             </label>
           </div>
 
-          <div class="checkbox" style="padding-top: 0px;">
+          <div class="checkbox">
             <label>
               <input type="checkbox" ng-model="datacopy.wants_ami"
               ng-disabled="!datacopy.wants_snapshot || (datacopy.wants_snapshot && datacopy.wants_instance)">
-              Create AMI
+              AMI
             </label>
           </div>
 
-          <div class="checkbox" style="padding-top: 0px;">
+          <div class="checkbox">
             <label>
               <input type="checkbox" ng-model="datacopy.wants_instance"
               ng-disabled="!datacopy.wants_ami">
-              Create Instance
+              Instance
             </label>
           </div>
 
