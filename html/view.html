@@ -324,23 +324,20 @@
                 ng-class="{'glyphicon-chevron-down': status.crdopen,
                   'glyphicon-chevron-right': !status.crdopen}"></i>
             </uib-accordion-heading>
-            <div class="form-group">
-              <label for="size_gb" class="col-sm-5 control-label">
+            <div>
+              <label for="size_gb">
                 <span class="mypopover"
                   popover-trigger="mouseenter mouseleave"
                   popover-title="Root Disk Size"
                   popover-placement="right"
                   popover-append-to-body="true"
-                  uib-popover="The size of the Root Disk, /dev/sda or /dev/xvda, is
-                               specified here. Enter an integer. Click the Customise
-                               Root Disk button to set other EBS volume options for
-                               this disk.">
+                  uib-popover="The size of the Root Disk in GiB for /dev/sda or /dev/xvda.
+                               Use an integer value.">
                     Root Disk Size
                 </span>
               </label>
-              <div class="col-sm-5">
-                <input class="form-control col-xs-3" id="size_gb"
-                  ng-model="datacopy.size_gb" placeholder="E.g. 10"
+              <div>
+                <input id="size_gb" ng-model="datacopy.size_gb" placeholder="E.g. 10"
                   type="text" ng-trim='false' required>
               </div>
             </div>
@@ -354,23 +351,82 @@
                 ng-class="{'glyphicon-chevron-down': status.ciopen,
                   'glyphicon-chevron-right': !status.ciopen}"></i>
             </uib-accordion-heading>
-            <div class="form-group">
-              <label for="size_gb" class="col-sm-5 control-label">
+            <div>
+              <label for="size_gb">
                 <span class="mypopover"
                   popover-trigger="mouseenter mouseleave"
                   popover-title="Instance Type"
                   popover-placement="right"
                   popover-append-to-body="true"
-                  uib-popover="The instance type will be used if the Create Instance
-                               option is selected. This can be changed by clicking
-                               the Customise Instance button below.">
+                  uib-popover="The instance type will be used when the Create Instance
+                               option is checked. See https://aws.amazon.com/ec2/instance-types/
+                               for more information.">
                   Instance Type
                 </span>
               </label>
-              <div class="col-sm-7">
+              <div>
+                <!--
                 <input class="form-control col-xs-7" id="size_gb"
                   ng-model="datacopy.instance_type" placeholder="" type="text"
                   ng-trim='false' ng-disabled="true" required>
+                -->
+                <select selectpicker required data-show-subtext=true
+                  data-width="auto" ng-model="datacopy.instance_type">
+                  <optgroup label="General Purpose">
+                    <option data-subtext="0.5 GiB RAM EBS-Only">t2.nano</option>
+                    <option data-subtext="1 GiB RAM EBS-Only">t2.micro</option>
+                    <option data-subtext="2 GiB RAM EBS-Only">t2.small</option>
+                    <option data-subtext="3 GiB RAM EBS-Only">t2.medium</option>
+                    <option data-subtext="4 GiB RAM EBS-Only">t2.large</option>
+                    <option data-subtext="2xCPU 8GiB RAM EBS-Only">m4.large</option>
+                    <option data-subtext="4xCPU 16GiB RAM EBS-Only">m4.xlarge</option>
+                    <option data-subtext="8xCPU 32GiB RAM EBS-Only">m4.2xlarge</option>
+                    <option data-subtext="16xCPU 64GiB RAM EBS-Only">m4.4xlarge</option>
+                    <option data-subtext="40xCPU 160GiB RAM EBS-Only">m4.10xlarge</option>
+                    <option data-subtext="64xCPU 256GiB RAM EBS-Only">m4.16xlarge</option>
+                    <option data-subtext="1xCPU 3.75GiB RAM 1x4 SSD">m3.medium</option>
+                    <option data-subtext="2xCPU 7.5GiB RAM 1x32 SSD">m3.large</option>
+                    <option data-subtext="4xCPU 15GiB RAM 2x40 SSD">m3.xlarge</option>
+                    <option data-subtext="8xCPU 30GiB RAM 2x80 SSD">m3.2xlarge</option>
+                  </optgroup>
+                  <optgroup label="Compute Optimised">
+                    <option data-subtext="2xCPU 3.75GiB RAM EBS-Only">c4.large</option>
+                    <option data-subtext="4xCPU 7.5GiB RAM EBS-Only">c4.xlarge</option>
+                    <option data-subtext="8xCPU 15GiB RAM EBS-Only">c4.2xlarge</option>
+                    <option data-subtext="16xCPU 30GiB RAM EBS-Only">c4.4xlarge</option>
+                    <option data-subtext="36xCPU 60GiB RAM EBS-Only">c4.8xlarge</option>
+                    <option data-subtext="2xCPU 3.75GiB RAM 2x16 SSD">c3.large</option>
+                    <option data-subtext="4xCPU 7.5GiB RAM 2x40 SSD">c3.xlarge</option>
+                    <option data-subtext="8xCPU 15GiB RAM 2x80 SSD">c3.2xlarge</option>
+                    <option data-subtext="16xCPU 30GiB RAM 2x160 SSD">c3.4xlarge</option>
+                    <option data-subtext="32xCPU 60GiB RAM 2x320 SSD">c3.8xlarge</option>
+                  </optgroup>
+                  <optgroup label="Memory Optimised">
+                    <option data-subtext="2xCPU 15.25GiB RAM 1x32 SSD">r3.large</option>
+                    <option data-subtext="4xCPU 30.5GiB RAM 1x80 SSD">r3.xlarge</option>
+                    <option data-subtext="8xCPU 61GiB RAM 1x160 SSD">r3.2xlarge</option>
+                    <option data-subtext="16xCPU 122GiB RAM 1x320 SSD">r3.4xlarge</option>
+                    <option data-subtext="32xCPU 244GiB RAM 2x320 SSD">r3.8xlarge</option>
+                    <option data-subtext="128xCPU 1952GiB RAM 2x1920 SSD">x1.32xlarge</option>
+                  </optgroup>
+                  <optgroup label="Storage Optimised">
+                    <option data-subtext="4xCPU 30.5GiB RAM 1x800 SSD">i2.xlarge</option>
+                    <option data-subtext="8xCPU 61GiB RAM 2x800 SSD">i2.2xlarge</option>
+                    <option data-subtext="16xCPU 122GiB RAM 4x800 SSD">i2.4xlarge</option>
+                    <option data-subtext="32xCPU 244GiB RAM 8x800 SSD">i2.8xlarge</option>
+                    <option data-subtext="4xCPU 30.5GiB RAM 3x2000 SSD">d2.xlarge</option>
+                    <option data-subtext="8xCPU 61GiB RAM 6x2000 SSD">d2.2xlarge</option>
+                    <option data-subtext="16xCPU 122GiB RAM 12x2000 SSD">d2.4xlarge</option>
+                    <option data-subtext="36xCPU 244GiB RAM 24x2000 SSD">d2.8xlarge</option>
+                  </optgroup>
+                  <optgroup label="Accelerated Computing">
+                    <option data-subtext="1xGPU 4xVCPU 61GiB RAM EBS-Only">p2.xlarge</option>
+                    <option data-subtext="8xGPU 32xVCPU 488GiB RAM EBS-Only">p2.8xlarge</option>
+                    <option data-subtext="16xGPU 64xVCPU 732GiB RAM EBS-Only">p2.16xlarge</option>
+                    <option data-subtext="1xGPU 8xVCPU 15GiB RAM 1x60 SSD">g2.2xlarge</option>
+                    <option data-subtext="2xGPU 32xVCPU 60GiB RAM 2x120 SSD">g2.8xlarge</option>
+                  </optgroup>
+                </select>
               </div>
             </div>
           </div>
