@@ -33,6 +33,10 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.datacopy.wants_instance = false;
   $scope.datacopy.wants_ami = false;
   $scope.datacopy.wants_snapshot = false;
+  $scope.zones = {};
+  $scope.zones.availzones = [];
+  $scope.zones.chosen_availzone = "";
+  $scope.zones.aminame = "";
   $scope.dirsize = {};
   $scope.migrate = {};
 
@@ -212,6 +216,69 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   };
 
   // ----------------------------------------------------------------------
+  $scope.GetAvailZones = function( ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    $http({
+      method: 'GET',
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/describe-availability-zone?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.region.Name
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        var azones = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      if( azones == null ) {
+        $scope.message = "Error: Could not get the status of the availability " +
+                         "zone the Obdi worker is in."
+      }
+
+      $scope.zones.availzones = [];
+      for( var i=0; i < azones.AvailabilityZones.length; ++i ){
+          $scope.zones.availzones.push( azones.AvailabilityZones[i].ZoneName );
+      }
+
+      $scope.zones.chosen_availzone = $scope.zones.availzones[0];
+
+      $timeout( function() {
+          $('#availzonepicker').selectpicker('refresh');
+      }, 200 );
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
   $scope.Migrate = function( ) {
   // ----------------------------------------------------------------------
   // Runs the helloworld-runscript.sh script on the worker.
@@ -299,6 +366,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
       $scope.migrate.obdi_worker_availzone.status = "finished";
 
+      //$scope.zones.chosen_availzone = $scope.awsworker[0].Instances[0].AvailabilityZone
       $scope.Migrate_CheckAvailZone();
 
     }).error( function(data,status) {
@@ -1042,11 +1110,16 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.migrate.ami = {};
     $scope.migrate.ami.status = "started";
 
-    var params = { Name: "AMI-"+$scope.migrate.snapshot.snapshotid,
+    if( $scope.zones.aminame == "" ) {
+        $scope.zones.aminame = "AMI-"+$scope.migrate.snapshot.snapshotid;
+    }
+
+    var params = { Name: $scope.zones.aminame,
                    Description: "Created by obdi-aws-p2ec2 from " +
                                 $scope.migrate.snapshot.snapshotid,
                    RootDeviceName: "sda1",
                    VirtualizationType: "hvm",
+                   Architecture: "x86_64",
                    BlockDeviceMappings: [
                    {
                        DeviceName: "sda1",
@@ -1128,6 +1201,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         "MinCount": 1,
         "KeyName": $scope.awsdata.Aws_keyname,
         "SecurityGroups": $scope.awsdata.Aws_securitygroups,
+        "Placement": {
+            "AvailabilityZone": $scope.zones.chosen_availzone,
+        },
         "BlockDeviceMappings":[
             {
                 "DeviceName": "sda1",
@@ -1471,6 +1547,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
     $scope.datacopy = {};
     $scope.datacopy.instance_type = "t2.micro";
+
+    $scope.GetAvailZones();
   };
 
   // ----------------------------------------------------------------------

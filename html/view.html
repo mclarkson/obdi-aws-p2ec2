@@ -343,6 +343,32 @@
             </div>
           </div>
 
+          <div uib-accordion-group class="panel-default" is-open="status.amiopen"
+           is-disabled="!datacopy.wants_ami">
+            <uib-accordion-heading>
+              Customise AMI
+              <i class="pull-right glyphicon"
+                ng-class="{'glyphicon-chevron-down': status.amiopen,
+                  'glyphicon-chevron-right': !status.amiopen}"></i>
+            </uib-accordion-heading>
+            <div>
+              <label for="aminame">
+                <span class="mypopover"
+                  popover-trigger="mouseenter mouseleave"
+                  popover-title="AMI Name"
+                  popover-placement="right"
+                  popover-append-to-body="true"
+                  uib-popover="Set the Name field. This is not the Tag Name.">
+                    AMI Name
+                </span>
+              </label>
+              <div>
+                <input id="aminame" ng-model="zones.aminame" placeholder="My Great Image"
+                  type="text" ng-trim='false' required>
+              </div>
+            </div>
+          </div>
+
           <div uib-accordion-group class="panel-default" is-open="status.ciopen"
            is-disabled="!datacopy.wants_instance">
             <uib-accordion-heading>
@@ -429,8 +455,36 @@
                 </select>
               </div>
             </div>
-          </div>
 
+            <p style="font-size:4px">&nbsp;</p>
+
+            <div>
+              <label for="size_gb">
+                <span class="mypopover"
+                  popover-trigger="mouseenter mouseleave"
+                  popover-title="Availability Zone"
+                  popover-placement="right"
+                  popover-append-to-body="true"
+                  uib-popover="The availability zone to place the instance in.">
+                  Availability Zone
+                </span>
+              </label>
+              <div>
+                <!--
+                <input class="form-control col-xs-7" id="size_gb"
+                  ng-model="datacopy.instance_type" placeholder="" type="text"
+                  ng-trim='false' ng-disabled="true" required>
+                -->
+                <select selectpicker id="availzonepicker" required data-show-subtext=true
+                  data-width="auto" ng-model="zones.chosen_availzone">
+                  <optgroup label="For region {{region.Name}}">
+                    <option ng-repeat="choice in zones.availzones">{{choice}}</option>
+                  </optgroup>
+                </select>
+              </div>
+            </div>
+
+          </div>
         </uib-accordion>
 
         <!-- CREATE CHECKBOXES -->
