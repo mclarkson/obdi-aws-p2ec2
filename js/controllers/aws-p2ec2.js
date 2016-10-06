@@ -1114,7 +1114,8 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.zones.aminame = "AMI-"+$scope.migrate.snapshot.snapshotid;
     }
 
-    var params = { Name: $scope.zones.aminame,
+    var params = {
+                   Name: $scope.zones.aminame,
                    Description: "Created by obdi-aws-p2ec2 from " +
                                 $scope.migrate.snapshot.snapshotid,
                    RootDeviceName: "sda1",
@@ -1195,25 +1196,25 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.migrate.instance.status = "started";
 
     var params = {
-        "ImageId": $scope.migrate.ami.amiid,
-        "InstanceType": $scope.datacopy.instance_type,
-        "MaxCount": 1,
-        "MinCount": 1,
-        "KeyName": $scope.awsdata.Aws_keyname,
-        "SecurityGroups": $scope.awsdata.Aws_securitygroups,
-        "Placement": {
-            "AvailabilityZone": $scope.zones.chosen_availzone,
-        },
-        "BlockDeviceMappings":[
-            {
-                "DeviceName": "sda1",
-                "Ebs":{
-                    "DeleteOnTermination":true,
-                    "VolumeSize": parseInt($scope.datacopy.size_gb),
-                    "VolumeType": "gp2"
-                 }
-             }
-        ]
+                   ImageId: $scope.migrate.ami.amiid,
+                   InstanceType: $scope.datacopy.instance_type,
+                   MaxCount: 1,
+                   MinCount: 1,
+                   KeyName: $scope.awsdata.Aws_keyname,
+                   SecurityGroups: $scope.awsdata.Aws_securitygroups,
+                   Placement: {
+                       AvailabilityZone: $scope.zones.chosen_availzone,
+                   },
+                   BlockDeviceMappings:[
+                       {
+                           DeviceName: "sda1",
+                           Ebs:{
+                               DeleteOnTermination:true,
+                               VolumeSize: parseInt($scope.datacopy.size_gb),
+                               VolumeType: "gp2"
+                            }
+                        }
+                   ]
     };
 
     $http({
