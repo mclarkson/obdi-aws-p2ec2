@@ -1064,7 +1064,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
         data = { DryRun: false,
                  VolumeId: $scope.migrate.create_volume.volumeid
-               }
+               };
 
         // Sneakily delete the volume here
         $http({
@@ -1142,6 +1142,23 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
       // NEXT...
       if( $scope.snapshotstatus.Snapshots[0].State == "completed" ) {
+
+        var data = { DryRun: false,
+                     SnapshotId: $scope.migrate.snapshot.savedsnapshotid
+                   };
+
+        // Sneakily delete the source snapshot here
+        $http({
+          method: 'POST',
+          data: data,
+          url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+               + "/aws-ec2lib/delete-snapshot?env_id="
+               + $rootScope.awsp2ec2_plugin.envId
+               + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+               + '&time='+new Date().getTime().toString()
+        }).success( function(data, status, headers, config) {
+            $scope.migrate.detachvolume.status = "deleted";
+        }); // Ignore the error (FIXME)
 
         $scope.migrate.copysnapshot.status = "finished";
         nextfn(0);
