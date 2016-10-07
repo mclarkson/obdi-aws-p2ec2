@@ -656,7 +656,7 @@
         </p>
       </div>
 
-      <!-- Create Volume -->
+      <!-- Detach Volume -->
 
       <div ng-if="migrate.detachvolume.status == 'started'">
         <p class="col-sm-4 right"><b>Volume:</b></p>
@@ -691,10 +691,31 @@
         <p class="col-sm-4 right"><b>Snapshot:</b>
         <p class="col-sm-8">Waiting for snapshot creation to complete
           <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
       </div>
       <div ng-if="migrate.snapshot.status == 'finished'">
         <p class="col-sm-4 right"><b>Snapshot:</b>
-        <p class="col-sm-8">Created as {{migrate.snapshot.snapshotid}}</p>
+        <p class="col-sm-8">Created as {{migrate.snapshot.savedsnapshotid}}</p>
+      </div>
+
+      <!-- Copy Snapshot -->
+
+      <div ng-if="migrate.copysnapshot.status == 'started'">
+        <p class="col-sm-4 right"><b>Copy Snapshot:</b></p>
+        <p class="col-sm-8">Copying snapshot to {{region.Name}}
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.copysnapshot.status == 'waiting'">
+        <p class="col-sm-4 right"><b>Copy Snapshot:</b></p>
+        <p class="col-sm-8">Waiting for cross region copy to complete
+          <i class="ellipsis"><i>.</i><i>.</i><i>.</i></i>
+        </p>
+      </div>
+      <div ng-if="migrate.copysnapshot.status == 'finished'">
+        <p class="col-sm-4 right"><b>Copy Snapshot:</b></p>
+        <p class="col-sm-8">Created as {{migrate.snapshot.snapshotid}} in
+        {{region.Name}}</p>
       </div>
 
       <!-- Create AMI -->

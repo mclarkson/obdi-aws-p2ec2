@@ -984,10 +984,23 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       }
 
       $scope.migrate.snapshot.status = "checking";
+      // Save the snapshot id 'cos it might be changed later
+      // and we still want to see the old value in the screen log.
+      $scope.migrate.snapshot.savedsnapshotid = $scope.snapshot.SnapshotId;
       $scope.migrate.snapshot.snapshotid = $scope.snapshot.SnapshotId;
 
       // NEXT...
-      $scope.Migrate_WaitForSnapshot( $scope.Migrate_CreateAMI );
+      if( $scope.region.Name == $scope.awsdata.Aws_obdi_worker_region ) {
+
+          // If obdi instance is in the chosen region:
+          $scope.Migrate_WaitForSnapshot( $scope.Migrate_CreateAMI );
+
+      } else {
+
+          // If obdi instance is not in the chosen region:
+          $scope.Migrate_WaitForSnapshot( $scope.Migrate_CopySnapshot );
+
+      }
 
     }).error( function(data,status) {
       if (status>=500) {
@@ -1099,6 +1112,142 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   };
 
   // ----------------------------------------------------------------------
+  $scope.Migrate_WaitForSnapshot2 = function( nextfn ) {
+  // ----------------------------------------------------------------------
+  // Runs the helloworld-runscript.sh script on the worker.
+
+    var params = { "snapshot_id":[$scope.migrate.snapshot.snapshotid] };
+
+    $http({
+      method: 'GET',
+      params: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/describe-snapshots?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.region.Name
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        $scope.snapshotstatus = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      if( $scope.snapshotstatus == null ) {
+        $scope.message = "Error: describe-snapshot returned no data. Check " +
+                         "to see if the snapshot was created and report this error."
+      }
+
+      // NEXT...
+      if( $scope.snapshotstatus.Snapshots[0].State == "completed" ) {
+
+        $scope.migrate.copysnapshot.status = "finished";
+        nextfn(0);
+
+      } else {
+
+        $scope.Migrate_WaitForSnapshot2( nextfn );
+
+      }
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  };
+
+  // ----------------------------------------------------------------------
+  $scope.Migrate_CopySnapshot = function( ) {
+  // ----------------------------------------------------------------------
+
+    $scope.migrate.copysnapshot = {};
+    $scope.migrate.copysnapshot.status = "started";
+
+    var params = {
+        "SourceRegion": $scope.awsdata.Aws_obdi_worker_region,
+        "SourceSnapshotId": $scope.snapshot.SnapshotId,
+        "Description": "Obdi-aws-p2ec2 copied snapshot from " +
+                       $scope.awsdata.Aws_obdi_worker_region + 
+                       " (" + $scope.snapshot.SnapshotId +
+                       ")."
+    };
+
+    $http({
+      method: 'POST',
+      data: params,
+      url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
+           + "/aws-ec2lib/copy-snapshot?env_id="
+           + $rootScope.awsp2ec2_plugin.envId
+           + "&region=" + $scope.region.Name
+           + '&time='+new Date().getTime().toString()
+    }).success( function(data, status, headers, config) {
+
+      try {
+        snap = $.parseJSON(data.Text);
+      } catch (e) {
+        clearMessages();
+        $scope.message = "Error: " + e;
+      }
+
+      $scope.migrate.copysnapshot.status = "waiting";
+      $scope.migrate.copysnapshot.oldsnapshotid = $scope.migrate.snapshot.snapshotid;
+      $scope.migrate.copysnapshot.snapshotid = snap.SnapshotId;
+
+      // CHANGE snapshotid to the new one
+      $scope.migrate.snapshot.snapshotid = snap.SnapshotId;
+
+      // NEXT...
+      $scope.Migrate_WaitForSnapshot2( $scope.Migrate_CreateAMI );
+
+    }).error( function(data,status) {
+      if (status>=500) {
+        $scope.login.errtext = "Server error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status==401) {
+        $scope.login.errtext = "Session expired.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else if (status>=400) {
+        clearMessages();
+        $scope.message = "Server said: " + data['Error'];
+        $scope.error = true;
+      } else if (status==0) {
+        // This is a guess really
+        $scope.login.errtext = "Could not connect to server.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      } else {
+        $scope.login.errtext = "Logged out due to an unknown error.";
+        $scope.login.error = true;
+        $scope.login.pageurl = "login.html";
+      }
+    });
+  }
+
+  // ----------------------------------------------------------------------
   $scope.Migrate_CreateAMI = function( ) {
   // ----------------------------------------------------------------------
 
@@ -1109,10 +1258,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
     $scope.migrate.ami = {};
     $scope.migrate.ami.status = "started";
-
-    if( $scope.zones.aminame == "" ) {
-        $scope.zones.aminame = "AMI-"+$scope.migrate.snapshot.snapshotid;
-    }
 
     var params = {
                    Name: $scope.zones.aminame,
@@ -1126,7 +1271,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
                        DeviceName: "sda1",
                        Ebs: {
                            DeleteOnTermination: true,
-                           SnapshotId: $scope.snapshot.SnapshotId,
+                           SnapshotId: $scope.migrate.snapshot.snapshotid,
                            VolumeSize: parseInt($scope.datacopy.size_gb),
                            VolumeType: "gp2"
                        }
@@ -1139,7 +1284,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
            + "/aws-ec2lib/register-image?env_id="
            + $rootScope.awsp2ec2_plugin.envId
-           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + "&region=" + $scope.region.Name
            + '&time='+new Date().getTime().toString()
     }).success( function(data, status, headers, config) {
 
@@ -1223,7 +1368,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       url: baseUrl + "/" + $scope.login.userid + "/" + $scope.login.guid
            + "/aws-ec2lib/run-instances?env_id="
            + $rootScope.awsp2ec2_plugin.envId
-           + "&region=" + $scope.awsdata.Aws_obdi_worker_region
+           + "&region=" + $scope.region.Name
            + '&time='+new Date().getTime().toString()
     }).success( function(data, status, headers, config) {
 
@@ -1548,6 +1693,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
     $scope.datacopy = {};
     $scope.datacopy.instance_type = "t2.micro";
+
+    var b = $scope.awsp2ec2_plugin.path.split('/');
+    $scope.zones.aminame = b[b.length-1]
 
     $scope.GetAvailZones();
   };
