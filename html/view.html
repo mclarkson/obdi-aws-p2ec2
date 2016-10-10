@@ -240,7 +240,12 @@
       <h4 class="page-header">AWS Region: {{region.Name}} - Create Instance</h4>
 
       <p>Start by pressing the blue Calculate Directory Size button or enter
-         the size (in GB) yourself in the Customise Root Disk section.</p>
+         the size (in GB) yourself in the Customise Root Disk section. A
+         Volume will only be created in the same availability zone and region
+         that the obdi aws instance is in. A Snapshot or AMI is created in the
+         chosen region. An instance is created in the chosen region and
+         availability zone.
+      </p>
 
       <div class="form-horizontal prepend-xs-1" role="form">
 
