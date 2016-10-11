@@ -445,23 +445,28 @@ ssh_cmd $DESTSRV savestdout \
     "$SUDO chroot $CHROOTDIR bash -c \"chkconfig --list --type sysv | awk '{ print \\\$1; }' | grep -ve sshd -e crond -e network -e nrpe -e ntpd -e ntpdate -e xinetd | while read a b; do chkconfig \\\$a off; done\""
 
 fstab=$(cat <<EnD
-DEVICE="eth0"
-BOOTPROTO="dhcp"
-IPV6INIT="yes"
-MTU="1500"
-NM_CONTROLLED="yes"
-ONBOOT="yes"
-TYPE="Ethernet"
-GATEWAY=$GATEWAY
+DEVICE=eth0
+BOOTPROTO=dhcp
+IPV6INIT=yes
+ONBOOT=yes
+TYPE=Ethernet
 # Extra options
+#MTU=1500
+#NM_CONTROLLED=yes
 #USERCTL=yes
 #PEERDNS=yes
 #IPV6INIT=no
+#DHCPV6C=yes
+#DHCPV6C_OPTIONS=-nw
 #PERSISTENT_DHCLIENT=yes
 #RES_OPTIONS="timeout:2 attempts:5"
 #DHCP_ARP_CHECK=no
 EnD
 )
+
+[[ -n $GATEWAY ]] && {
+    fstab=$(echo "$fstab";echo "GATEWAY=$GATEWAY")
+}
 
 ssh_cmd $DESTSRV savestdout \
     "$SUDO bash -c 'cat <<EnD >$CHROOTDIR/etc/sysconfig/network-scripts/ifcfg-eth0
