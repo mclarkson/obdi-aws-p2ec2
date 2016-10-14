@@ -1433,6 +1433,9 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.Migrate_End = function( ) {
   // ----------------------------------------------------------------------
 
+    if( $scope.notifyme.now == true )
+        $scope.notifyMe("Obdi AWS 'Create' job has finished.");
+
     $scope.migrate.migration = {};
     $scope.migrate.migration.status = 'alldone';
   }
@@ -1584,7 +1587,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       $scope.dirsize_complete = true;
 
       if( $scope.notifyme.now == true )
-        $scope.notifyMe("Obdi job has finished.");
+        $scope.notifyMe("Obdi directory size job has finished.");
 
       $scope.datacopy.size_gb = Math.round(($scope.dirsize[0].sizeb)/1000/1000/1000) + 20;
 

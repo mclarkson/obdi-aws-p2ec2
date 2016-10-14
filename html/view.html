@@ -266,11 +266,11 @@
               popover-append-to-body="true"
               uib-popover="Press the Calculate Directory Size button to calculate
                            the size of the directory that will be written to
-                           Amazon EC2. Select 'Notify when size calculation
-                           is complete' to get a system notification when the
-                           calculation is complete.  The Root Disk Size field,
-                           below, will be updated with the calculated size plus
-                           20 GB.">
+                           Amazon EC2. Select 'Notify when complete' to get a
+                           system notification when the size calculation has
+                           finished or when the Create operation has finished.
+                           The Root Disk Size field, below, will be updated
+                           with the calculated size plus 20 GB.">
               Size Query
             </span>
           </label>
@@ -299,7 +299,7 @@
             <div class="checkbox">
               <label>
                 <input type="checkbox" ng-model="notifyme.now">
-                Notify when size calculation is complete
+                Notify when complete
               </label>
             </div>
           </div>
