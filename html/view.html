@@ -46,10 +46,12 @@
         ng-click="Migrate()" style="margin-top: -5px; margin-right: 8px;">
         <i class="fa fa-check"> </i> Create {{CreateWhat()}}</button>
       <button class="btn btn-sm btn-success pull-right" type="button"
+        ng-disabled="migrate.running"
         ng-click="Restart()" ng-if="!create_volume"
         style="margin-top: -5px;">
         <i class="fa fa-refresh"> </i> Restart</button>
       <button class="btn btn-sm btn-default pull-right" type="button"
+        ng-disabled="migrate.running"
         ng-click="goBack()" style="margin-top: -5px; margin-right: 8px;">
         <i class="fa fa-arrow-left"> </i> Go Back</button></h3>
     </div>

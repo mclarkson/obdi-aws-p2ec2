@@ -39,6 +39,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   $scope.zones.aminame = "";
   $scope.dirsize = {};
   $scope.migrate = {};
+  $scope.migrate.running = false;
 
   // Pages
   $scope.mainview = true;
@@ -115,6 +116,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.dirsize_in_progress = false;
     $scope.dirsize_complete = false;
     $scope.migrate.page = false;
+    $scope.migrate.running = false;
     $scope.datacopy = {};
     $scope.datacopy.wants_instance = false;
     $scope.datacopy.wants_ami = false;
@@ -156,6 +158,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
     $scope.dirsize_in_progress = false;
     $scope.dirsize_complete = false;
     $scope.migrate.page = false;
+    $scope.migrate.running = false;
 
     // Reset the search text (not used since search is disabled)
     //$rootScope.$broadcast( "setsearchtext", $scope.previousfilter );
@@ -281,12 +284,12 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   // ----------------------------------------------------------------------
   $scope.Migrate = function( ) {
   // ----------------------------------------------------------------------
-  // Runs the helloworld-runscript.sh script on the worker.
 
     $scope.envchosen = false;
     $scope.create_volume = false;
     $scope.migrate = {};
     $scope.migrate.page = true;
+    $scope.migrate.running = true;
 
     $scope.migrate.obdi_worker_availzone = {};
     $scope.migrate.obdi_worker_availzone.status = "started";
@@ -323,6 +326,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -382,6 +386,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -455,6 +460,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -530,6 +536,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -594,6 +601,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -685,6 +693,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -762,6 +771,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -816,6 +826,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -870,6 +881,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -933,6 +945,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -1015,6 +1028,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -1098,6 +1112,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -1182,6 +1197,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -1251,6 +1267,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -1332,6 +1349,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -1416,6 +1434,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         clearMessages();
         $scope.message = "Server said: " + data['Error'];
         $scope.error = true;
+        $scope.migrate.running = false;
       } else if (status==0) {
         // This is a guess really
         $scope.login.errtext = "Could not connect to server.";
@@ -1438,6 +1457,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
     $scope.migrate.migration = {};
     $scope.migrate.migration.status = 'alldone';
+    $scope.migrate.running = false;
   }
 
   // Polling functions
