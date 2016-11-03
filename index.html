@@ -1,73 +1,55 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
-    <meta charset="UTF-8">
-    <title>Obdi-aws-p2ec2 by mclarkson</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-  </head>
-  <body>
-    <section class="page-header">
-      <h1 class="project-name">Obdi-aws-p2ec2</h1>
-      <h2 class="project-tagline">Creates AWS EC2 Instances from Full System Backups.</h2>
-      <a href="https://github.com/mclarkson/obdi-aws-p2ec2" class="btn">View on GitHub</a>
-      <a href="https://github.com/mclarkson/obdi-aws-p2ec2/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/mclarkson/obdi-aws-p2ec2/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
-
-    <section class="main-content">
-      <h1>
-<a id="obdi-aws-p2ec2" class="anchor" href="#obdi-aws-p2ec2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>obdi-aws-p2ec2</h1>
-
-<p>Creates AWS EC2 Instances from Full System Backups.</p>
-
-<p>Dependencies: <a href="https://github.com/mclarkson/obdi-aws-ec2lib">obdi-aws-ec2lib</a></p>
-
-<p>Known Users: <a href="https://github.com/mclarkson/obdi-rsyncbackup">obdi-rsyncbackup</a></p>
-
-<h1>
-<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Todo</h1>
-
-<h1>
-<a id="screenshot" class="anchor" href="#screenshot" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Screenshot</h1>
-
-<p><img src="images/obdi-aws-p2ec2-small.png?raw=true" alt=""></p>
-
-<h1>
-<a id="what-is-it" class="anchor" href="#what-is-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is it?</h1>
-
-<p>This plugin writes files to a volume mounted into AWS management instance
-ultimately creating a new AWS instance from those files.</p>
-
-<p>No entry is made in the sidebar for this plugin since this plugin is accessed
-from other compatible plugins.</p>
-
-<p>For example, when this plugin is installed, the obdi-rsyncbackup plugin will
-show a 'Create Amazon EC2 Instance' button in the file viewer when it thinks it
-has found a root filesystem. Pressing the button will take the user to this
-plugin and allow them to create an Amazon Virtual Machine.</p>
-
-<h1>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
-
-<h2>
-<a id="installing-the-plugin" class="anchor" href="#installing-the-plugin" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing the plugin</h2>
-
-<ul>
-<li>Log into the admin interface, 'https://ObdiHost/manager/admin'.</li>
-<li>In Plugins -&gt; Manage Repositories add, '<a href="https://github.com/mclarkson/obdi-awstools-repository.git">https://github.com/mclarkson/obdi-awstools-repository.git</a>'</li>
-<li>In Plugins -&gt; Add Plugin, choose 'aws-p2ec2' and Install.</li>
-</ul>
-
-<h2>
-<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h2>
-
-<p>Set the AWS_ACCESS_KEY_ID_1 json object in the environment, using the Admin interface.</p>
-
-<pre><code>{
+<head>
+  <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.1.25">
+  <meta charset="UTF-8">
+  <title>Obdi-aws-p2ec2 by mclarkson</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+  <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+</head>
+<body>
+  <section class="page-header">
+    <h1 class="project-name">Obdi-aws-p2ec2</h1>
+    <h2 class="project-tagline">Creates AWS EC2 Instances from Full System Backups.</h2>
+    <a href= "https://github.com/mclarkson/obdi-aws-p2ec2" class="btn">View on GitHub</a>
+    <a href="http://awstools.obdi.io" class="btn">Parent Repository</a>
+    <a href="http://obdi.io" class="btn">Obdi Home Page</a>
+    <!--
+    <a href= "https://github.com/mclarkson/obdi-aws-p2ec2/zipball/master" class="btn">Download .zip</a>
+    <a href= "https://github.com/mclarkson/obdi-aws-p2ec2/tarball/master" class="btn">Download .tar.gz</a>
+    -->
+  </section>
+  <section class="main-content">
+    <h1><a id="obdi-aws-p2ec2" class="anchor" href="#obdi-aws-p2ec2" aria-hidden="true"></a>obdi-aws-p2ec2</h1>
+    <p>Creates AWS EC2 Instances from Full System Backups.</p>
+    <p>Dependencies: <a href="https://github.com/mclarkson/obdi-aws-ec2lib">obdi-aws-ec2lib</a></p>
+    <p>Known Users: <a href="https://github.com/mclarkson/obdi-rsyncbackup">obdi-rsyncbackup</a></p>
+    <h1><a id="todo" class="anchor" href="#todo" aria-hidden="true"></a>Todo</h1>
+    <h1><a id="screenshot" class="anchor" href="#screenshot" aria-hidden="true"></a>Screenshot</h1>
+    <p><img src="images/obdi-aws-p2ec2-small.png?raw=true" alt=""></p>
+    <h1><a id="what-is-it" class="anchor" href="#what-is-it" aria-hidden="true"></a>What is it?</h1>
+    <p>This plugin writes files to a volume mounted into AWS management instance ultimately creating a new AWS instance
+    from those files.</p>
+    <p>No entry is made in the sidebar for this plugin since this plugin is accessed from other compatible plugins.</p>
+    <p>For example, when this plugin is installed, the obdi-rsyncbackup plugin will show a 'Create Amazon EC2 Instance'
+    button in the file viewer when it thinks it has found a root filesystem. Pressing the button will take the user to
+    this plugin and allow them to create an Amazon Virtual Machine.</p>
+    <h1><a id="installation" class="anchor" href="#installation" aria-hidden="true"></a>Installation</h1>
+    <h2><a id="installing-the-plugin" class="anchor" href="#installing-the-plugin" aria-hidden="true"></a>Installing
+    the plugin</h2>
+    <ul>
+      <li>Log into the admin interface, 'https://ObdiHost/manager/admin'.</li>
+      <li>In Plugins -&gt; Manage Repositories add, '<a href=
+      "https://github.com/mclarkson/obdi-awstools-repository.git">https://github.com/mclarkson/obdi-awstools-repository.git</a>'
+      </li>
+      <li>In Plugins -&gt; Add Plugin, choose 'aws-p2ec2' and Install.</li>
+    </ul>
+    <h2><a id="configuration" class="anchor" href="#configuration" aria-hidden="true"></a>Configuration</h2>
+    <p>Set the AWS_ACCESS_KEY_ID_1 json object in the environment, using the Admin interface.</p>
+    <pre><code>{
     "Aws_access_key_id":"ALIENX2KD6OINVA510NQ",
     "Aws_secret_access_key":"wHdlwoigU637fgnjAu+IRNVHfT-EXnIU5C2MbiQd",
     "Aws_obdi_worker_instance_id":"i-e29eg362",
@@ -86,112 +68,74 @@ plugin and allow them to create an Amazon Virtual Machine.</p>
     "Aws_shell_ssh_key_b64":"LS0tLSTXdURGxLU...1ySBQUklWQVRFIEtFWS0tLS0t"
 }
 </code></pre>
-
-<p>The following variables are used up until OS modifications by the Javascript/HTML code.</p>
-
-<p><em>Aws_access_key_id</em></p>
-
-<blockquote>
-<p>AWS API access key ID</p>
-</blockquote>
-
-<p><em>Aws_secret_access_key</em></p>
-
-<blockquote>
-<p>AWS API password</p>
-</blockquote>
-
-<p><em>Aws_obdi_worker_instance_id</em></p>
-
-<blockquote>
-<p>The AWS instance that contains the Obdi worker.
-This AWS instance will be used to copy, mount and modify the backup image.</p>
-</blockquote>
-
-<p><em>Aws_obdi_worker_region</em></p>
-
-<blockquote>
-<p>The region the Obdi worker resides in.</p>
-</blockquote>
-
-<p><em>Aws_obdi_worker_url</em></p>
-
-<blockquote>
-<p>The URL used to access the Obdi worker.</p>
-</blockquote>
-
-<p><em>Aws_obdi_worker_key</em></p>
-
-<blockquote>
-<p>The password for the Obdi worker.</p>
-</blockquote>
-
-<p><em>Aws_filter</em></p>
-
-<blockquote>
-<p>The global filter to apply, if any. For example, you might want to filter all
-results by 'key-name=ourkeyname' or 'owner-id=25513944296'.</p>
-</blockquote>
-
-<p><em>Aws_keyname</em></p>
-
-<blockquote>
-<p>The key name used when creating a new EC2 Instance.</p>
-</blockquote>
-
-<p><em>Aws_securitygroups</em></p>
-
-<blockquote>
-<p>List of security group names (not IDs) that instances will belong to when
-creating a new EC2 Instance.</p>
-</blockquote>
-
-<p>The following variables are used by the Bash script when modifying the OS:</p>
-
-<p><em>Aws_dnsserver_ip</em> and <em>Aws_dnsdomain</em></p>
-
-<blockquote>
-<p>Should both be set to avoid an error message. Affects the final '/etc/resolv.conf'.</p>
-</blockquote>
-
-<p><em>Aws_gateway</em></p>
-
-<blockquote>
-<p>Affects the networking in '/etc/sysconfig/network-scripts/ifcfg-eth0'.</p>
-</blockquote>
-
-<p><em>Aws_obdi_worker_ip</em></p>
-
-<blockquote>
-<p>The IP address of the AWS instance, Aws_obdi_worker_instance_id. This is the address
-as seen from the Backup server.</p>
-</blockquote>
-
-<p><em>Aws_shell_user_name</em></p>
-
-<blockquote>
-<p>User name to use to connect to Aws_obdi_worker_ip using ssh.</p>
-</blockquote>
-
-<p><em>Aws_shell_ssh_key_b64</em></p>
-
-<blockquote>
-<p>The base64 encoded key file.</p>
-</blockquote>
-
-<h1>
-<a id="dev" class="anchor" href="#dev" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dev</h1>
-
-<p><img src="images/instance-creation.png?raw=true" alt=""></p>
-
-<h3>
-<a id="get-not-so-secret-data" class="anchor" href="#get-not-so-secret-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>get-not-so-secret-data</h3>
-
-<p>Gets Json Object Capability data for AWS_ACCESS_KEY_ID_1 for an environment.
-This data will be stored in the Browser's DOM so Aws_secret_access_key and
-Aws_obdi_worker_key have obfuscated values.</p>
-
-<pre><code># Log in
+    <p>The following variables are used up until OS modifications by the Javascript/HTML code.</p>
+    <p><em>Aws_access_key_id</em></p>
+    <blockquote>
+      <p>AWS API access key ID</p>
+    </blockquote>
+    <p><em>Aws_secret_access_key</em></p>
+    <blockquote>
+      <p>AWS API password</p>
+    </blockquote>
+    <p><em>Aws_obdi_worker_instance_id</em></p>
+    <blockquote>
+      <p>The AWS instance that contains the Obdi worker. This AWS instance will be used to copy, mount and modify the
+      backup image.</p>
+    </blockquote>
+    <p><em>Aws_obdi_worker_region</em></p>
+    <blockquote>
+      <p>The region the Obdi worker resides in.</p>
+    </blockquote>
+    <p><em>Aws_obdi_worker_url</em></p>
+    <blockquote>
+      <p>The URL used to access the Obdi worker.</p>
+    </blockquote>
+    <p><em>Aws_obdi_worker_key</em></p>
+    <blockquote>
+      <p>The password for the Obdi worker.</p>
+    </blockquote>
+    <p><em>Aws_filter</em></p>
+    <blockquote>
+      <p>The global filter to apply, if any. For example, you might want to filter all results by 'key-name=ourkeyname'
+      or 'owner-id=25513944296'.</p>
+    </blockquote>
+    <p><em>Aws_keyname</em></p>
+    <blockquote>
+      <p>The key name used when creating a new EC2 Instance.</p>
+    </blockquote>
+    <p><em>Aws_securitygroups</em></p>
+    <blockquote>
+      <p>List of security group names (not IDs) that instances will belong to when creating a new EC2 Instance.</p>
+    </blockquote>
+    <p>The following variables are used by the Bash script when modifying the OS:</p>
+    <p><em>Aws_dnsserver_ip</em> and <em>Aws_dnsdomain</em></p>
+    <blockquote>
+      <p>Should both be set to avoid an error message. Affects the final '/etc/resolv.conf'.</p>
+    </blockquote>
+    <p><em>Aws_gateway</em></p>
+    <blockquote>
+      <p>Affects the networking in '/etc/sysconfig/network-scripts/ifcfg-eth0'.</p>
+    </blockquote>
+    <p><em>Aws_obdi_worker_ip</em></p>
+    <blockquote>
+      <p>The IP address of the AWS instance, Aws_obdi_worker_instance_id. This is the address as seen from the Backup
+      server.</p>
+    </blockquote>
+    <p><em>Aws_shell_user_name</em></p>
+    <blockquote>
+      <p>User name to use to connect to Aws_obdi_worker_ip using ssh.</p>
+    </blockquote>
+    <p><em>Aws_shell_ssh_key_b64</em></p>
+    <blockquote>
+      <p>The base64 encoded key file.</p>
+    </blockquote>
+    <h1><a id="dev" class="anchor" href="#dev" aria-hidden="true"></a>Dev</h1>
+    <p><img src="images/instance-creation.png?raw=true" alt=""></p>
+    <h3><a id="get-not-so-secret-data" class="anchor" href="#get-not-so-secret-data" aria-hidden=
+    "true"></a>get-not-so-secret-data</h3>
+    <p>Gets Json Object Capability data for AWS_ACCESS_KEY_ID_1 for an environment. This data will be stored in the
+    Browser's DOM so Aws_secret_access_key and Aws_obdi_worker_key have obfuscated values.</p>
+    <pre><code># Log in
 
 $ ipport="127.0.0.1:443"
 
@@ -203,17 +147,11 @@ $ guid=`curl -ks -d '{"Login":"nomen.nescio","Password":"password"}' \
 $ curl -k "https://$ipport/api/nomen.nescio/$guid/aws-p2ec2/get-not-so-secret-data?env_id=1"
 
 </code></pre>
-
-<h3>
-<a id="osedits-centos6" class="anchor" href="#osedits-centos6" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>osedits-centos6</h3>
-
-<p>TODO: Document parameter options.</p>
-
-<p>TODO: Document req params for capability object.</p>
-
-<p>Edits Centos 6 OS.</p>
-
-<pre><code># Log in
+    <h3><a id="osedits-centos6" class="anchor" href="#osedits-centos6" aria-hidden="true"></a>osedits-centos6</h3>
+    <p>TODO: Document parameter options.</p>
+    <p>TODO: Document req params for capability object.</p>
+    <p>Edits Centos 6 OS.</p>
+    <pre><code># Log in
 
 $ ipport="127.0.0.1:443"
 
@@ -225,15 +163,13 @@ $ guid=`curl -ks -d '{"Login":"nomen.nescio","Password":"password"}' \
 $ curl -ks -X POST "https://$ipport/api/nomen.nescio/$guid/aws-p2ec2/osedits?env_id=1&amp;task_id=1&amp;path=/nosnap/centosbox004&amp;force=true&amp;umountdir=true"
 
 </code></pre>
-
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/mclarkson/obdi-aws-p2ec2">Obdi-aws-p2ec2</a> is maintained by <a href="https://github.com/mclarkson">mclarkson</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
-
-    </section>
-
-  
-  </body>
+    <footer class="site-footer">
+      <span class="site-footer-owner"><a href="https://github.com/mclarkson/obdi-aws-p2ec2">Obdi-aws-p2ec2</a> is
+      maintained by <a href="https://github.com/mclarkson">mclarkson</a>.</span> <span class="site-footer-credits">This
+      page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href=
+      "https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason
+      Long</a>.</span>
+    </footer>
+  </section>
+</body>
 </html>
