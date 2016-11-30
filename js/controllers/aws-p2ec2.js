@@ -1380,7 +1380,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
                    InstanceType: $scope.datacopy.instance_type,
                    MaxCount: 1,
                    MinCount: 1,
-                   KeyName: $scope.awsdata.Aws_keyname,
                    SecurityGroups: $scope.awsdata.Aws_securitygroups,
                    Placement: {
                        AvailabilityZone: $scope.zones.chosen_availzone,
@@ -1396,6 +1395,10 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
                         }
                    ]
     };
+
+    if( $scope.awsdata.Aws_keyname ) {
+        params.KeyName = $scope.awsdata.Aws_keyname;
+    }
 
     $http({
       method: 'POST',
