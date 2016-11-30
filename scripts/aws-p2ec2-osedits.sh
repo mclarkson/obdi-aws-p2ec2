@@ -108,7 +108,7 @@ ssh_cmd() {
     if [[ $2 == "savestdout" ]]; then
         trap : INT
         echo "> Running remotely: $3"
-        ( ssh -i "$TMPKEYFILE" "$REMOTEUSER@$DESTSRV" "$3" \
+        ( ssh -tti "$TMPKEYFILE" "$REMOTEUSER@$DESTSRV" "$3" \
           >$tmpout 2>$tmperr;
           echo $? >$tmpret) & waiton=$!;
         ( t=0;n=0
@@ -136,7 +136,7 @@ ssh_cmd() {
         LAST_STDOUT=
         trap : INT
         echo "> Running remotely: $3"
-        ( ssh -i "$TMPKEYFILE" "$REMOTEUSER@$DESTSRV" "$3" \
+        ( ssh -tti "$TMPKEYFILE" "$REMOTEUSER@$DESTSRV" "$3" \
           >$tmpout 2>$tmperr;
           echo $? >$tmpret) & waiton=$!;
         ( t=0;n=0
@@ -236,6 +236,7 @@ chmod 0600 $TMPKEYFILE
         }
     }
 
+    # Should use parted and gpt instead of fdisk
     ssh_cmd $DESTSRV savestdout \
         "$SUDO fdisk $MOUNTDEV < <(echo -e 'n\np\n1\n\n\np\nw\nq')"
 
@@ -285,7 +286,7 @@ else
 	echo "> Checking for mark"
 
 	ssh_cmd $DESTSRV savestdout \
-		"sudo test -e $REMOTEDIR/.aws-p2ec2_edited_this_fs || echo ok"
+		"$SUDO test -e $REMOTEDIR/.aws-p2ec2_edited_this_fs || echo ok"
 
 	[[ $LAST_STDOUT != "ok" ]] && {
 		echo "ERROR: File exists. Cannot continue."
@@ -298,7 +299,7 @@ fi
 echo "> Marking filesystem as edited"
 
 ssh_cmd $DESTSRV savestdout \
-    "sudo touch $REMOTEDIR/.aws-p2ec2_edited_this_fs"
+    "$SUDO touch $REMOTEDIR/.aws-p2ec2_edited_this_fs"
 
 # find mount device
 
