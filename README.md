@@ -149,7 +149,7 @@ $ guid=`curl -ks -d '{"Login":"nomen.nescio","Password":"password"}' \
 
 # Edit the OS
 
-$ curl -ks -X POST "https://$ipport/api/nomen.nescio/$guid/aws-p2ec2/osedits?env_id=1&task_id=1&path=/nosnap/centosbox004&force=true&umountdir=true"
+$ curl -ks -X POST "https://$ipport/api/nomen.nescio/$guid/aws-p2ec2/osedits-centos6?env_id=1&task_id=1&path=/nosnap/centosbox004&force=true&umountdir=true"
 
 ```
 

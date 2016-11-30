@@ -125,3 +125,8 @@ fi
 rm -f -- "$t"
 trap - EXIT
 
+# Now force all the golang plugins to compile...
+
+curl -k "$proto://$ipport/api/admin/$guid/aws-p2ec2/osedits-centos6"
+curl -k "$proto://$ipport/api/admin/$guid/aws-p2ec2/get-not-so-secret-data"
+
