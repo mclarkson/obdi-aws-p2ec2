@@ -21,6 +21,8 @@
 mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
       $timeout,baseUrl,$rootScope) {
 
+  $scope.delay = 1000;
+
   // Data
   $scope.regions = [];
   $scope.region = {};
@@ -585,7 +587,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         $scope.migrate.create_volume.volumeid = $scope.ebsvolume.VolumeId;
         nextfn(0);
       } else {
-        $scope.Migrate_WaitForVolume( nextfn );
+        $timeout( $scope.Migrate_WaitForVolume( nextfn ), $scope.delay );
       }
 
     }).error( function(data,status) {
@@ -753,7 +755,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
       // NEXT...
       if( $scope.ebsvolumestatus.Volumes[0].Attachments[0].State != "attached" ) {
-        $scope.Migrate_WaitForAttach(i+1);
+        $timeout( $scope.Migrate_WaitForAttach(i+1), $scope.delay );
       } else {
         $scope.Migrate_CopyFiles();
       }
@@ -1096,7 +1098,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         nextfn(0);
 
       } else {
-        $scope.Migrate_WaitForSnapshot( nextfn );
+        $timeout( $scope.Migrate_WaitForSnapshot( nextfn ), $scope.delay );
       }
 
     }).error( function(data,status) {
@@ -1179,9 +1181,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         nextfn(0);
 
       } else {
-
-        $scope.Migrate_WaitForSnapshot2( nextfn );
-
+        $timeout( $scope.Migrate_WaitForSnapshot2( nextfn ), $scope.delay );
       }
 
     }).error( function(data,status) {
