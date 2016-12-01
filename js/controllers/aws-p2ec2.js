@@ -1380,7 +1380,6 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
                    InstanceType: $scope.datacopy.instance_type,
                    MaxCount: 1,
                    MinCount: 1,
-                   SecurityGroupIds: $scope.awsdata.Aws_securitygroups,
                    Placement: {
                        AvailabilityZone: $scope.zones.chosen_availzone,
                    },
@@ -1398,6 +1397,14 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
 
     if( $scope.awsdata.Aws_keyname ) {
         params.KeyName = $scope.awsdata.Aws_keyname;
+    }
+
+    if( $scope.awsdata.Aws_subnetid ) {
+        params.SubnetId = $scope.awsdata.Aws_subnetid;
+    }
+
+    if( $scope.awsdata.Aws_securitygroups ) {
+        params.SecurityGroupIds = $scope.awsdata.Aws_securitygroups;
     }
 
     $http({
