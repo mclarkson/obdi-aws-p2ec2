@@ -86,8 +86,8 @@ The following variables are used up until OS modifications by the Javascript/HTM
 > The key name used when creating a new EC2 Instance.
 
 *Aws_securitygroups*
-> List of security group names (not IDs) that instances will belong to when
-> creating a new EC2 Instance.
+> List of security group IDs (not names) that instances will belong to when
+> creating a new EC2 Instance. This option should be called Aws_securitygroupids.
 
 *Aws_subnetid*
 > A subnet ID of a subnet to put the new instance in.
