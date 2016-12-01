@@ -1380,7 +1380,7 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
                    InstanceType: $scope.datacopy.instance_type,
                    MaxCount: 1,
                    MinCount: 1,
-                   SecurityGroups: $scope.awsdata.Aws_securitygroups,
+                   SecurityGroupIds: $scope.awsdata.Aws_securitygroups,
                    Placement: {
                        AvailabilityZone: $scope.zones.chosen_availzone,
                    },
