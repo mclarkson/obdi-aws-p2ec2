@@ -171,6 +171,7 @@ func (t *Plugin) GetRequest(args *Args, response *[]byte) error {
 		Aws_obdi_worker_key         string   // E.g. secretkey
 		Aws_filter                  string   // E.g. key-name=itsupkey
 		Aws_keyname                 string   // E.g. itsupkey
+		Aws_subnetid                string   // E.g. sg-4622i73f
 		Aws_securitygroups          []string // E.g. sgroup1
 	}
 
