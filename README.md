@@ -89,6 +89,9 @@ The following variables are used up until OS modifications by the Javascript/HTM
 > List of security group names (not IDs) that instances will belong to when
 > creating a new EC2 Instance.
 
+*Aws_subnetid*
+> A subnet ID of a subnet to put the new instance in.
+
 The following variables are used by the Bash script when modifying the OS:
 
 *Aws_dnsserver_ip* and *Aws_dnsdomain*
