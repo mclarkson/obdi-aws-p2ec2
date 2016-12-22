@@ -213,7 +213,7 @@
             <tr>
               <th>#</th>
               <th>Id</th>
-              <th>Tag</th>
+              <th>Name Tag</th>
               <th>Key</th>
               <th>Type</th>
               <th>Private IP</th>
@@ -224,7 +224,7 @@
                class="{{style(item.State.Code)}}">
                 <td>{{$index+1}}</td>
                 <td>{{item.InstanceId}}</td>
-                <td>{{item.Tags[0].Value}}</td>
+                <td>{{NameTag(item.Tags)}}</td>
                 <td>{{item.KeyName}}</td>
                 <td>{{item.InstanceType}}</td>
                 <td>{{item.PrivateIPAddress}}</td>

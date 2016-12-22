@@ -178,6 +178,19 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
   }
 
   // ----------------------------------------------------------------------
+  $scope.NameTag = function( tags_array ) {
+  // ----------------------------------------------------------------------
+
+      for( var i=0; i < tags_array.length; ++i ) {
+          if( tags_array[i].Key == "Name" ) {
+              return tags_array[i].Value;
+          }
+      }
+
+      return "";
+  }
+
+  // ----------------------------------------------------------------------
   $scope.FillRegionsTable = function() {
   // ----------------------------------------------------------------------
 
