@@ -1883,17 +1883,18 @@ mgrApp.controller("awsp2ec2", function ($scope,$http,$uibModal,$log,
         }).success( function(data, status, headers, config) {
           job = data[0];
           if(job.Status == 0 || job.Status == 1 || job.Status == 4) {
-            if( count > 5000 ) { // 5000 - usually 120, this could take long
-              clearMessages();
-              $scope.message = "Job took too long. check job ID " +
-                               + id + ", then try again.";
-              $scope.message_jobid = job['Id'];
-            } else {
+            // No taking-too-long check as copy can take hours!
+            //if( count > 500000 ) {
+            //  clearMessages();
+            //  $scope.message = "Job took too long. check job ID " +
+            //                   + id + ", then try again.";
+            //  $scope.message_jobid = job['Id'];
+            //} else {
               // Then retry: capped exponential backoff
               delay = delay < 600 ? delay * 2 : 1000;
               count = count + 1;
               $scope.PollForJobFinish(id,delay,count,func);
-            }
+            //}
           } else if(job.Status == 5) { // Job was successfully completed
             func( id );
           } else { // Some error
